@@ -13,6 +13,7 @@
             --primary: #00f3ff;
             --secondary: #bd00ff;
             --success: #00ff9d;
+            --danger: #ff4444;
             --text-main: #ffffff;
             --text-muted: #9ca3af;
             --border: rgba(255, 255, 255, 0.1);
@@ -50,6 +51,7 @@
             letter-spacing: 1px;
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
             font-weight: 700;
         }
@@ -67,8 +69,8 @@
         }
         .btn-purple:hover { background: var(--secondary); color: #fff; box-shadow: 0 0 20px var(--secondary); }
 
-        .btn-danger { border-color: #ff4444; color: #ff4444; }
-        .btn-danger:hover { background: #ff4444; color: #fff; }
+        .btn-danger { border-color: var(--danger); color: var(--danger); background: rgba(255, 68, 68, 0.05); }
+        .btn-danger:hover { background: var(--danger); color: #fff; box-shadow: 0 0 20px var(--danger); }
 
         input, select, textarea {
             background: #111;
@@ -88,10 +90,10 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            background: rgba(5, 5, 5, 0.8);
+            background: rgba(5, 5, 5, 0.85);
             backdrop-filter: blur(var(--backdrop));
             border-bottom: 1px solid var(--border);
-            padding: 1.5rem 2rem;
+            padding: 1rem 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -102,13 +104,13 @@
         .logo {
             font-family: var(--font-tech);
             font-weight: 800;
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             background: linear-gradient(to right, var(--primary), var(--secondary));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
-        .search-wrapper { flex-grow: 1; max-width: 600px; position: relative; }
+        .search-wrapper { flex-grow: 1; max-width: 500px; position: relative; }
         .search-icon { position: absolute; right: 15px; top: 12px; color: var(--text-muted); pointer-events: none; }
 
         /* --- ADMIN PANEL --- */
@@ -117,8 +119,9 @@
             background: #0f0f13;
             border-bottom: 1px solid var(--primary);
             padding: 15px 0;
+            animation: slideDown 0.3s ease;
         }
-        .show-admin #admin-panel { display: block; animation: slideDown 0.3s ease; }
+        .show-admin #admin-panel { display: block; }
         @keyframes slideDown { from { transform: translateY(-20px); opacity:0; } to { transform: translateY(0); opacity:1; } }
 
         .admin-bar {
@@ -128,6 +131,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         /* --- FILTERS --- */
@@ -206,6 +211,7 @@
             font-weight: 800;
             letter-spacing: 0.5px;
             transition: 0.2s;
+            display: block;
         }
         .launch-btn:hover { background: var(--primary); transform: scale(1.02); }
 
@@ -245,12 +251,12 @@
         }
 
         .modal-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem; color: #fff; }
-        .close-modal { position: absolute; top: 20px; right: 20px; background: none; color: #fff; font-size: 1.2rem; }
+        .close-modal { position: absolute; top: 20px; right: 20px; background: none; color: #fff; font-size: 1.5rem; cursor: pointer; }
         
         .form-row { margin-bottom: 15px; }
         .form-label { display: block; margin-bottom: 6px; color: var(--text-muted); font-size: 0.85rem; }
 
-        /* --- DONATION QR --- */
+        /* --- QR STYLES --- */
         .qr-wrapper {
             background: #fff;
             padding: 15px;
@@ -274,10 +280,9 @@
             align-items: center;
         }
         .upi-box:hover { border-color: var(--success); color: var(--success); background: rgba(0, 255, 157, 0.05); }
-        .copy-hint { font-size: 0.7rem; opacity: 0.5; }
 
         footer { text-align: center; padding: 4rem 2rem; color: var(--text-muted); border-top: 1px solid var(--border); margin-top: auto; }
-
+        .footer-link { color: var(--primary); text-decoration: none; }
     </style>
 </head>
 <body>
@@ -301,7 +306,7 @@
             <span style="color:var(--primary); font-weight:700;">SYSTEM ADMIN ACTIVE</span>
             <div style="display:flex; gap:10px;">
                 <button class="btn-neon" onclick="openAddModal()">+ Add App</button>
-                <button class="btn-neon" style="border-color:#00ff00; color:#00ff00;" onclick="cleanExport()">💾 Export Production Code</button>
+                <button class="btn-neon" style="border-color:#00ff00; color:#00ff00;" onclick="handleExport()">💾 Export Production Code</button>
                 <button class="btn-neon btn-danger" onclick="logout()">Logout</button>
             </div>
         </div>
@@ -316,8 +321,8 @@
     </div>
 
     <footer>
-        <p>&copy; 2026 H24 Creationz. All Systems Nominal.</p>
-        <p style="margin-top:10px; font-size:0.8rem;">Contact: h24creationz@gmail.com</p>
+        <p>System Status: Online | &copy; 2026 H24 Creationz</p>
+        <p style="margin-top:10px;">Contact: <a href="mailto:h24creationz@gmail.com" class="footer-link">h24creationz@gmail.com</a></p>
     </footer>
 
     <div id="donateModal" class="modal-overlay">
@@ -328,16 +333,16 @@
                 <p style="color:var(--text-muted); margin-bottom:15px;">Scan to pay via any UPI App</p>
                 
                 <div class="qr-wrapper">
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi://pay?pa=8667701001@upi&pn=Harsha%20Varthan" alt="UPI QR">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi://pay?pa=8667701001@upi&pn=Harsha%20Varthan&cu=INR" alt="UPI QR">
                 </div>
 
                 <div class="upi-box" onclick="copyText('8667701001@upi')">
                     <span>8667701001@upi</span>
-                    <span class="copy-hint">CLICK TO COPY</span>
+                    <span style="font-size:0.7rem; opacity:0.5;">COPY</span>
                 </div>
                 <div class="upi-box" onclick="copyText('8667701001@yapl')">
                     <span>8667701001@yapl</span>
-                    <span class="copy-hint">CLICK TO COPY</span>
+                    <span style="font-size:0.7rem; opacity:0.5;">COPY</span>
                 </div>
             </div>
         </div>
@@ -354,10 +359,9 @@
                 <div class="form-row">
                     <label class="form-label">Application URL</label>
                     <div style="display:flex; gap:10px;">
-                        <input type="url" id="appLink" required placeholder="https://..." onchange="clearAutoState()">
-                        <button type="button" class="btn-neon" onclick="autoFetchData()">✨ Auto-Fetch</button>
+                        <input type="url" id="appLink" required placeholder="https://..." onblur="autoFetchData()">
+                        <button type="button" class="btn-neon" onclick="autoFetchData()">⚡ Fetch</button>
                     </div>
-                    <small style="color:#555; font-size:0.7rem;">Click Auto-Fetch to grab Title/Desc from the link</small>
                 </div>
 
                 <div class="form-row">
@@ -366,17 +370,15 @@
                 </div>
 
                 <div class="form-row">
-                    <label class="form-label">Category (Type new or select)</label>
-                    <input type="text" id="appCat" list="catOptions" placeholder="e.g. Finance" required>
+                    <label class="form-label">Category</label>
+                    <input type="text" id="appCat" list="catOptions" placeholder="Select or Type New..." required>
                     <datalist id="catOptions">
                         </datalist>
                 </div>
 
-                <div class="form-row" style="display:flex; gap:15px;">
-                    <div style="flex:1;">
-                        <label class="form-label">Icon (Emoji)</label>
-                        <input type="text" id="appIcon" placeholder="🚀" maxlength="4">
-                    </div>
+                <div class="form-row">
+                    <label class="form-label">Icon (Emoji)</label>
+                    <input type="text" id="appIcon" placeholder="🚀" maxlength="4">
                 </div>
 
                 <div class="form-row">
@@ -384,15 +386,14 @@
                     <textarea id="appDesc" rows="3" required></textarea>
                 </div>
 
-                <button type="submit" class="btn-neon" style="width:100%; justify-content:center; padding:15px;">SAVE CONFIGURATION</button>
+                <button type="submit" class="btn-neon" style="width:100%; padding:15px;">SAVE CONFIGURATION</button>
             </form>
         </div>
     </div>
 
     <script>
         /* =================================================================
-           DATA STORE: The Single Source of Truth
-           All your apps live here. The Export function updates this block.
+           MASTER DATA REGISTRY
            =================================================================
         */
         /* JSON-START */
@@ -428,7 +429,7 @@
             {
                 "name": "QR Studio",
                 "link": "https://harshavarthanep.github.io/Dynamic-QR/",
-                "category": "Tools",
+                "category": "Productivity",
                 "icon": "🔳",
                 "desc": "Create dynamic, trackable QR codes that you can edit even after printing."
             },
@@ -456,38 +457,43 @@
         ];
         /* JSON-END */
 
-        // --- STATE MANAGEMENT ---
+        // --- STATE ---
         let isAdmin = false;
         let activeCategory = 'All';
 
-        // --- INITIALIZATION ---
-        function init() {
+        // --- INIT ---
+        window.addEventListener('DOMContentLoaded', () => {
             renderFilters();
             renderApps();
-            setupSearch();
-        }
+            // Ensure search works immediately
+            document.getElementById('searchInput').addEventListener('input', (e) => {
+                renderApps(e.target.value);
+            });
+        });
 
-        // --- RENDER FUNCTIONS ---
+        // --- RENDER LOGIC ---
         function renderFilters() {
             const container = document.getElementById('filterContainer');
             const dataList = document.getElementById('catOptions');
-            
-            // Extract unique categories dynamically
             const categories = ['All', ...new Set(apps.map(a => a.category))];
             
             container.innerHTML = '';
             dataList.innerHTML = '';
 
             categories.forEach(cat => {
-                // Filter Button
+                // UI Filters
                 const btn = document.createElement('button');
                 btn.className = `cat-tag ${cat === activeCategory ? 'active' : ''}`;
                 btn.innerText = cat;
-                btn.onclick = () => setCategory(cat);
+                btn.onclick = () => {
+                    activeCategory = cat;
+                    renderFilters();
+                    renderApps(document.getElementById('searchInput').value);
+                };
                 container.appendChild(btn);
 
-                // Add to Datalist for the "Add App" dropdown
-                if(cat !== 'All') {
+                // Datalist options
+                if (cat !== 'All') {
                     const opt = document.createElement('option');
                     opt.value = cat;
                     dataList.appendChild(opt);
@@ -507,7 +513,7 @@
             });
 
             filtered.forEach((app) => {
-                // Find original index for editing
+                // Get real index for editing/deleting based on object reference
                 const realIndex = apps.indexOf(app);
 
                 const div = document.createElement('div');
@@ -522,31 +528,19 @@
                     <a href="${app.link}" target="_blank" class="launch-btn">LAUNCH APP</a>
                     
                     <div class="admin-options">
-                        <button class="btn-neon" style="flex:1; justify-content:center;" onclick="editApp(${realIndex})">EDIT</button>
-                        <button class="btn-neon btn-danger" style="flex:1; justify-content:center;" onclick="deleteApp(${realIndex})">DELETE</button>
+                        <button class="btn-neon" style="flex:1;" onclick="editApp(${realIndex})">EDIT</button>
+                        <button class="btn-neon btn-danger" style="flex:1;" onclick="deleteApp(${realIndex})">DELETE</button>
                     </div>
                 `;
                 grid.appendChild(div);
             });
         }
 
-        function setCategory(cat) {
-            activeCategory = cat;
-            renderFilters(); // Re-render to highlight active
-            renderApps(document.getElementById('searchInput').value);
-        }
-
-        function setupSearch() {
-            document.getElementById('searchInput').addEventListener('input', (e) => {
-                renderApps(e.target.value);
-            });
-        }
-
-        // --- ADMIN SYSTEM ---
+        // --- ADMIN ACTIONS ---
         function toggleAdmin() {
-            if(isAdmin) return;
+            if (isAdmin) return;
             const pass = prompt("Enter Admin Password:");
-            if(pass === "admin") {
+            if (pass === "admin") {
                 isAdmin = true;
                 document.body.classList.add('show-admin');
             } else {
@@ -559,7 +553,6 @@
             document.body.classList.remove('show-admin');
         }
 
-        // --- ADD/EDIT LOGIC ---
         function openAddModal() {
             document.getElementById('editIndex').value = '-1';
             document.getElementById('appForm').reset();
@@ -580,9 +573,10 @@
         }
 
         function deleteApp(index) {
-            if(confirm('Are you sure you want to delete this app?')) {
+            if (confirm('Are you sure you want to delete this app?')) {
                 apps.splice(index, 1);
-                refreshUI();
+                renderFilters(); // Update filters if a category is now empty
+                renderApps();
             }
         }
 
@@ -593,120 +587,116 @@
             const newApp = {
                 name: document.getElementById('appName').value,
                 link: document.getElementById('appLink').value,
-                category: document.getElementById('appCat').value, // This accepts custom input
+                category: document.getElementById('appCat').value,
                 icon: document.getElementById('appIcon').value || '⚡',
                 desc: document.getElementById('appDesc').value
             };
 
-            if(index === -1) {
+            if (index === -1) {
                 apps.push(newApp);
             } else {
                 apps[index] = newApp;
             }
 
             closeModal('appModal');
-            refreshUI();
-        }
-
-        function refreshUI() {
-            renderFilters(); // To update categories if a new one was added
+            renderFilters(); // Update filters in case of new category
             renderApps();
         }
 
-        // --- SMART AUTO-FETCH (CORS PROXY) ---
-        function clearAutoState() {
-            // Reset button state if needed
-        }
-
+        // --- SMART AUTO FETCH ---
         async function autoFetchData() {
             const url = document.getElementById('appLink').value;
-            if(!url) { alert("Please enter a URL first."); return; }
+            // Only fetch if URL is present and Name is empty (to avoid overwriting user edits)
+            if (!url || document.getElementById('appName').value !== "") return;
 
             const btn = document.querySelector('button[onclick="autoFetchData()"]');
             const originalText = btn.innerText;
-            btn.innerText = "⏳ Fetching...";
+            btn.innerText = "⏳...";
 
             try {
-                // Use AllOrigins Proxy to bypass CORS
-                const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
-                const response = await fetch(proxyUrl);
-                const data = await response.json();
-
+                // Proxy to bypass CORS
+                const proxy = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+                const res = await fetch(proxy);
+                const data = await res.json();
+                
                 if (data.contents) {
                     const parser = new DOMParser();
                     const doc = parser.parseFromString(data.contents, "text/html");
 
-                    // Extract Title
                     const title = doc.querySelector('title')?.innerText || "";
+                    const desc = doc.querySelector('meta[name="description"]')?.getAttribute('content') || "";
                     
-                    // Extract Description
-                    const metaDesc = doc.querySelector('meta[name="description"]')?.getAttribute('content') || "";
-                    
-                    // Extract Icon (Basic Attempt)
-                    // Note: Getting emojis from favicons is hard, setting default
-                    
-                    // Fill Fields
                     if(title) document.getElementById('appName').value = title;
-                    if(metaDesc) document.getElementById('appDesc').value = metaDesc;
+                    if(desc) document.getElementById('appDesc').value = desc;
+
+                    // Auto-Guess Category based on keywords
+                    const lowerTitle = title.toLowerCase();
+                    const catInput = document.getElementById('appCat');
                     
-                    alert("Data fetched! Please verify the fields.");
+                    if(lowerTitle.includes('money') || lowerTitle.includes('finance') || lowerTitle.includes('wealth')) {
+                        catInput.value = "Finance";
+                    } else if(lowerTitle.includes('quiz') || lowerTitle.includes('study') || lowerTitle.includes('note')) {
+                        catInput.value = "Education";
+                    } else if(lowerTitle.includes('tool') || lowerTitle.includes('generator')) {
+                        catInput.value = "Dev Tools";
+                    } else {
+                        catInput.value = "Productivity"; // Default fallback
+                    }
                 }
             } catch (err) {
-                console.error(err);
-                alert("Could not auto-fetch. Security headers might be blocking the proxy. Please fill manually.");
+                console.log("Auto-fetch failed. User will enter manually.");
             }
-
             btn.innerText = originalText;
         }
 
-        // --- CLEAN EXPORT (The Fix for Extensions) ---
-        async function cleanExport() {
+        // --- CLEAN EXPORT (The Fix) ---
+        async function handleExport() {
             try {
-                // 1. Fetch the CLEAN source code of this file (ignoring browser DOM changes)
+                // 1. Fetch source file (ignores extensions)
                 const response = await fetch(window.location.href);
                 let sourceCode = await response.text();
 
-                // 2. Prepare the new JSON string
-                const newJSON = JSON.stringify(apps, null, 4);
+                // 2. Prepare Current Data
+                const currentDataJSON = JSON.stringify(apps, null, 4);
 
-                // 3. Use Regex to replace ONLY the content between our specific markers
-                // Pattern: /* JSON-START */ ... /* JSON-END */
-                const pattern = /(\/\* JSON-START \*\/)([\s\S]*?)(\/\* JSON-END \*\/)/;
+                // 3. Inject Current Data into Source Code
+                // We use the JSON-START markers to find the exact spot
+                const regex = /(\/\* JSON-START \*\/)([\s\S]*?)(\/\* JSON-END \*\/)/;
                 
-                if(pattern.test(sourceCode)) {
-                    // Replace the inner part
-                    const updatedCode = sourceCode.replace(pattern, `$1\nlet apps = ${newJSON};\n        $3`);
+                if (regex.test(sourceCode)) {
+                    // Replace old data with new data
+                    const updatedCode = sourceCode.replace(regex, `$1\n        let apps = ${currentDataJSON};\n        $3`);
                     
                     // 4. Copy to Clipboard
                     await navigator.clipboard.writeText(updatedCode);
-                    alert("✅ CLEAN SOURCE COPIED!\n\nExtensions ignored. Paste into GitHub index.html.");
+                    alert("✅ SUCCESS: Source Code Copied!\n\nDeleted apps are gone. New apps are added.\n\nPaste this into your GitHub index.html.");
                 } else {
-                    // Fallback if markers missing (first run)
-                    alert("Markers not found. Falling back to basic copy.");
-                    const basicCode = document.documentElement.outerHTML;
-                    await navigator.clipboard.writeText("<!DOCTYPE html>\n" + basicCode);
+                    // Fallback (If running locally without a server)
+                    throw new Error("Markers not found");
                 }
-
             } catch (e) {
-                console.error(e);
-                alert("Export failed (Local file access restriction?).\nCopying via basic method.");
-                // Fallback for local testing
-                // ... logic to strip scripts ...
+                // Fallback for local file testing where fetch() might be blocked
+                console.warn("Fetch failed, using DOM method. Extensions might be included.");
+                
+                // Clone the HTML
+                let html = document.documentElement.outerHTML;
+                
+                // Manually replace the array in the string
+                const jsonStr = JSON.stringify(apps, null, 4);
+                const cleanHTML = html.replace(/let apps = \[([\s\S]*?)\];/, `let apps = ${jsonStr};`);
+                
+                // Remove Admin Class
+                const finalHTML = cleanHTML.replace('class="show-admin"', '');
+
+                await navigator.clipboard.writeText("<!DOCTYPE html>\n" + finalHTML);
+                alert("⚠️ Local Export Used.\nCode copied. Please check for extension clutter before committing.");
             }
         }
 
         // --- UTILS ---
-        function openModal(id) { 
-            const m = document.getElementById(id);
-            m.classList.add('active');
-        }
-        function closeModal(id) { 
-            document.getElementById(id).classList.remove('active'); 
-        }
-        function copyText(txt) {
-            navigator.clipboard.writeText(txt);
-            alert("Copied: " + txt);
-        }
+        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+        function copyText(txt) { navigator.clipboard.writeText(txt); alert("Copied!"); }
 
         // Keyboard Shortcut
         document.addEventListener('keydown', (e) => {
@@ -715,9 +705,6 @@
                 document.getElementById('searchInput').focus();
             }
         });
-
-        // Start
-        init();
 
     </script>
 </body>
