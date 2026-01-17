@@ -2,24 +2,25 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>H24_NEXUS // SYSTEM</title>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
-        /* --- ZEN / STEALTH THEME (STABILIZED) --- */
+        /* --- ZEN / STEALTH THEME --- */
         :root {
             --bg: #050505;
             --surface: #0a0a0a;
             --surface-hover: #111111;
             --border: #333333;
+            --border-active: #ffffff;
             --text-main: #eeeeee;
             --text-dim: #666666;
-            --accent: #00ff00;
+            --accent: #00ff00; /* Terminal Green */
             --danger: #ff3333;
             --font: 'JetBrains Mono', monospace;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
+        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
 
         body {
             background-color: var(--bg);
@@ -35,22 +36,23 @@
             background-size: 40px 40px;
         }
 
-        /* --- UI ELEMENTS --- */
+        /* --- TYPOGRAPHY & BUTTONS --- */
         button { cursor: pointer; font-family: var(--font); border: none; background: none; transition: 0.2s; }
         a { text-decoration: none; color: inherit; }
 
         .btn {
             border: 1px solid var(--border);
             color: var(--text-dim);
-            padding: 8px 16px;
+            padding: 10px 16px;
             font-size: 0.8rem;
             text-transform: uppercase;
             letter-spacing: 1px;
             background: var(--bg);
+            white-space: nowrap;
         }
         .btn:hover { border-color: var(--text-main); color: var(--text-main); background: var(--surface-hover); }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
+        .btn:active { transform: scale(0.98); }
+        
         .btn-primary { border-color: var(--text-main); color: var(--text-main); font-weight: 700; }
         .btn-primary:hover { background: var(--text-main); color: var(--bg); }
         
@@ -65,48 +67,79 @@
             font-family: var(--font);
             width: 100%;
             font-size: 0.9rem;
-            transition: 0.2s;
+            border-radius: 0;
+            appearance: none;
         }
-        input:focus { border-color: var(--text-main); }
+        input:focus, textarea:focus { border-color: var(--text-main); }
 
         /* --- HEADER --- */
         header {
             position: sticky;
             top: 0;
             z-index: 50;
-            background: rgba(5, 5, 5, 0.95);
+            background: rgba(5, 5, 5, 0.9);
             backdrop-filter: blur(10px);
             border-bottom: 1px solid var(--border);
-            padding: 1.5rem 2rem;
+            padding: 1rem 1.5rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 15px;
         }
 
-        .brand { font-weight: 700; letter-spacing: -1px; font-size: 1.2rem; }
+        .brand { font-weight: 700; letter-spacing: -1px; font-size: 1.1rem; white-space: nowrap; }
         .brand span { color: var(--text-dim); }
 
-        .search-container { flex-grow: 1; max-width: 400px; margin: 0 2rem; display: flex; align-items: center; }
-        .search-input { border: none; border-bottom: 1px solid var(--border); background: transparent; padding: 5px; }
+        .search-container { flex-grow: 1; max-width: 400px; display: flex; align-items: center; }
+        .search-input { border: none; border-bottom: 1px solid var(--border); background: transparent; padding: 5px; border-radius: 0; }
         .search-input:focus { border-bottom-color: var(--text-main); }
 
-        /* --- ADMIN BAR --- */
+        /* --- ADMIN BAR (Mobile Optimized) --- */
         #admin-bar {
             display: none;
             background: var(--surface);
             border-bottom: 1px solid var(--border);
-            padding: 1rem 2rem;
+            padding: 1rem;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            justify-content: space-between;
         }
-        .admin-active #admin-bar { display: flex; justify-content: space-between; align-items: center; }
+        .admin-active #admin-bar { display: flex; }
+        .admin-label { color: var(--accent); font-size: 0.7rem; width: 100%; text-align: center; margin-bottom: 5px; }
+        .admin-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; width: 100%; }
 
-        /* --- GRID --- */
-        .grid-container { max-width: 1200px; margin: 0 auto; padding: 2rem; width: 100%; }
-        
-        .filters { margin-bottom: 2rem; display: flex; gap: 1rem; overflow-x: auto; padding-bottom: 10px; }
-        .filter-tag { font-size: 0.75rem; color: var(--text-dim); cursor: pointer; padding-bottom: 2px; border-bottom: 1px solid transparent; white-space: nowrap; }
+        /* --- APP GRID --- */
+        .grid-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1.5rem;
+            width: 100%;
+        }
+
+        .filters { margin-bottom: 2rem; display: flex; gap: 1rem; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
+        .filters::-webkit-scrollbar { display: none; }
+        .filter-tag { 
+            font-size: 0.75rem; 
+            color: var(--text-dim); 
+            cursor: pointer; 
+            padding: 5px 0;
+            border-bottom: 1px solid transparent; 
+            white-space: nowrap;
+        }
         .filter-tag.active { color: var(--text-main); border-bottom-color: var(--text-main); }
 
-        .app-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .app-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .app-grid { grid-template-columns: 1fr; }
+            header { padding: 1rem; }
+            .search-container { display: none; } /* Hide search on very small screens if needed, or stack it */
+        }
 
         /* --- CARD --- */
         .card {
@@ -115,21 +148,32 @@
             padding: 24px;
             display: flex;
             flex-direction: column;
-            transition: all 0.2s ease;
+            position: relative;
         }
-        .card:hover { border-color: var(--text-dim); transform: translateY(-2px); background: var(--surface); }
+
+        .card:hover { border-color: var(--text-dim); background: var(--surface); }
 
         .card-header { display: flex; justify-content: space-between; margin-bottom: 1rem; }
         .card-icon { font-size: 1.5rem; filter: grayscale(100%); transition: 0.2s; }
         .card:hover .card-icon { filter: grayscale(0%); }
+        
         .card-cat { font-size: 0.6rem; text-transform: uppercase; color: var(--text-dim); border: 1px solid var(--border); padding: 2px 6px; height: fit-content; }
 
         .card-title { font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; }
         .card-desc { font-size: 0.8rem; color: var(--text-dim); line-height: 1.6; flex-grow: 1; margin-bottom: 1.5rem; }
 
-        .launch-link { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 5px; }
-        .launch-link::after { content: "->"; transition: 0.2s; }
-        .launch-link:hover::after { margin-left: 5px; }
+        .launch-link {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: block;
+            padding: 10px;
+            text-align: center;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+        }
+        .launch-link:hover { background: var(--text-main); color: var(--bg); }
 
         /* Admin Tools */
         .admin-tools { display: none; gap: 5px; margin-top: auto; }
@@ -139,35 +183,52 @@
         /* --- MODALS --- */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9);
+            background: rgba(0,0,0,0.95);
             z-index: 100;
             display: none;
             justify-content: center;
             align-items: center;
+            padding: 20px;
         }
         .modal-overlay.open { display: flex; }
 
         .modal {
             background: var(--bg);
             border: 1px solid var(--text-main);
-            width: 500px;
-            max-width: 90%;
+            width: 100%;
+            max-width: 500px;
             padding: 2rem;
             position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
         }
-        .close-btn { position: absolute; top: 1rem; right: 1rem; font-size: 1.5rem; color: var(--text-dim); }
-        .modal-header { font-size: 1.2rem; margin-bottom: 2rem; font-weight: 700; border-bottom: 1px solid var(--border); padding-bottom: 1rem; }
+        .modal-header { font-size: 1.1rem; margin-bottom: 1.5rem; font-weight: 700; border-bottom: 1px solid var(--border); padding-bottom: 1rem; }
+        .close-btn { position: absolute; top: 1rem; right: 1rem; font-size: 1.5rem; color: var(--text-dim); padding: 5px; }
 
         .form-group { margin-bottom: 1.5rem; }
-        .form-label { display: block; font-size: 0.75rem; color: var(--text-dim); margin-bottom: 0.5rem; text-transform: uppercase; }
+        .form-label { display: block; font-size: 0.7rem; color: var(--text-dim); margin-bottom: 0.5rem; text-transform: uppercase; }
 
-        /* --- QR --- */
-        .qr-display { background: #fff; padding: 10px; width: 200px; margin: 0 auto 20px; }
+        /* --- QR AREA --- */
+        .qr-display {
+            background: #fff;
+            padding: 10px;
+            width: 180px;
+            margin: 0 auto 20px;
+        }
         .qr-display img { width: 100%; display: block; }
-        .upi-row { border: 1px solid var(--border); padding: 10px; margin-bottom: 5px; font-size: 0.8rem; cursor: pointer; display: flex; justify-content: space-between; }
+        .upi-row {
+            border: 1px solid var(--border);
+            padding: 12px;
+            margin-bottom: 8px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+        }
         .upi-row:hover { border-color: var(--text-main); background: var(--surface); }
 
-        footer { text-align: center; padding: 3rem; color: var(--text-dim); font-size: 0.75rem; border-top: 1px solid var(--border); }
+        footer { text-align: center; padding: 3rem 1rem; color: var(--text-dim); font-size: 0.75rem; border-top: 1px solid var(--border); }
+
     </style>
 </head>
 <body>
@@ -175,33 +236,34 @@
     <header>
         <div class="brand">H24<span>_NEXUS</span></div>
         <div class="search-container">
-            <span style="color:var(--text-dim)">></span>
+            <span style="color:var(--text-dim); margin-right:5px;">></span>
             <input type="text" id="searchInput" class="search-input" placeholder="search_system..." autocomplete="off">
         </div>
-        <div style="display:flex; gap:1rem;">
+        <div style="display:flex; gap:10px;">
             <button class="btn" onclick="openModal('modal-donate')">Donate</button>
             <button class="btn" onclick="toggleAdmin()">Admin</button>
         </div>
     </header>
 
     <div id="admin-bar">
-        <span style="color:var(--accent); font-size:0.8rem;">[ ADMIN_MODE_ENGAGED ]</span>
-        <div style="display:flex; gap:10px;">
-            <button class="btn btn-primary" onclick="initAddApp()">+ New App</button>
-            <button class="btn" id="exportBtn" style="border-color:var(--accent); color:var(--accent);" onclick="exportCode()">Save & Export</button>
+        <div class="admin-label">[ SYSTEM_ADMIN_ACTIVE ]</div>
+        <div class="admin-actions">
+            <button class="btn btn-primary" onclick="initAddApp()">+ New</button>
+            <button class="btn" style="border-color:var(--accent); color:var(--accent);" onclick="exportCode()">Save & Export</button>
             <button class="btn btn-danger" onclick="logout()">Exit</button>
         </div>
     </div>
 
     <div class="grid-container">
         <div class="filters" id="filter-bar"></div>
+
         <div class="app-grid" id="app-grid"></div>
     </div>
 
     <footer>
-        H24 CREATIONZ // SYSTEM ONLINE
-        <br>
-        <a href="mailto:h24creationz@gmail.com" style="border-bottom:1px dotted #666; margin-top:10px; display:inline-block;">h24creationz@gmail.com</a>
+        SYSTEM ONLINE // H24 CREATIONZ
+        <br><br>
+        <a href="mailto:h24creationz@gmail.com">h24creationz@gmail.com</a>
     </footer>
 
     <div id="modal-app" class="modal-overlay">
@@ -210,11 +272,13 @@
             <div class="modal-header" id="modal-title">CONFIGURE_APP</div>
             
             <form id="appForm">
-                <input type="hidden" id="edit-id"> <div class="form-group">
+                <input type="hidden" id="edit-index">
+                
+                <div class="form-group">
                     <label class="form-label">Target URL</label>
                     <div style="display:flex; gap:10px;">
                         <input type="url" id="inp-link" placeholder="https://" required>
-                        <button type="button" class="btn" id="fetch-btn" onclick="fetchMetadata()">FETCH</button>
+                        <button type="button" class="btn" id="fetch-btn" onclick="smartFetch()">FETCH</button>
                     </div>
                 </div>
 
@@ -249,11 +313,19 @@
         <div class="modal" style="text-align:center;">
             <button class="close-btn" onclick="closeModal('modal-donate')">×</button>
             <div class="modal-header">SUPPORT_DEV</div>
+            
             <div class="qr-display">
                 <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=8667701001@upi&pn=Harsha%20Varthan" alt="QR">
             </div>
-            <div class="upi-row" onclick="copy('8667701001@upi')"><span>8667701001@upi</span><span>[COPY]</span></div>
-            <div class="upi-row" onclick="copy('8667701001@yapl')"><span>8667701001@yapl</span><span>[COPY]</span></div>
+
+            <div class="upi-row" onclick="forceCopy('8667701001@upi')">
+                <span>8667701001@upi</span>
+                <span>[COPY]</span>
+            </div>
+            <div class="upi-row" onclick="forceCopy('8667701001@yapl')">
+                <span>8667701001@yapl</span>
+                <span>[COPY]</span>
+            </div>
         </div>
     </div>
 
@@ -265,7 +337,6 @@
         /* DB_START */
         let apps = [
             {
-                "id": 101,
                 "name": "CMA Companion",
                 "link": "https://harshavarthanep.github.io/CMA-companion/",
                 "category": "Education",
@@ -273,15 +344,13 @@
                 "desc": "Digital companion for CMA aspirants with study trackers."
             },
             {
-                "id": 102,
                 "name": "Exam Ready Pro",
                 "link": "https://harshavarthanep.github.io/Notes-to-Quizz/",
                 "category": "Education",
-                "icon": "🧠",
+                "icon": "📝",
                 "desc": "Convert notes to interactive quizzes for active recall."
             },
             {
-                "id": 103,
                 "name": "InfinityDrop Turbo",
                 "link": "https://harshavarthanep.github.io/Files-transfer2/",
                 "category": "Productivity",
@@ -289,7 +358,6 @@
                 "desc": "High-speed WebRTC file transfer. No server limits."
             },
             {
-                "id": 104,
                 "name": "InfinityDrop P2P",
                 "link": "https://harshavarthanep.github.io/Files-transfer/",
                 "category": "Productivity",
@@ -297,7 +365,6 @@
                 "desc": "Local peer-to-peer file sharing mechanism."
             },
             {
-                "id": 105,
                 "name": "QR Studio",
                 "link": "https://harshavarthanep.github.io/Dynamic-QR/",
                 "category": "Tools",
@@ -305,7 +372,6 @@
                 "desc": "Generate and manage dynamic QR codes."
             },
             {
-                "id": 106,
                 "name": "Wealth Tracker",
                 "link": "https://harshavarthanep.github.io/Wealth-tracker/",
                 "category": "Finance",
@@ -313,7 +379,6 @@
                 "desc": "Net worth and expense tracking dashboard."
             },
             {
-                "id": 107,
                 "name": "HTML2APK",
                 "link": "https://harshavarthanep.github.io/HTML2APK/",
                 "category": "Dev Tools",
@@ -321,7 +386,6 @@
                 "desc": "Wrapper tool to convert HTML/JS to Android APK."
             },
             {
-                "id": 108,
                 "name": "App Gen",
                 "link": "https://harshavarthanep.github.io/App-gen/",
                 "category": "Dev Tools",
@@ -331,18 +395,19 @@
         ];
         /* DB_END */
 
-        // Ensure IDs exist (Migration for old data)
-        apps.forEach((app, i) => { if(!app.id) app.id = Date.now() + i; });
-
+        // --- SYSTEM STATE ---
         let currentFilter = 'ALL';
 
+        // --- INIT ---
         function init() {
             renderFilters();
             renderGrid();
-            document.getElementById('searchInput').addEventListener('input', (e) => renderGrid(e.target.value));
+            document.getElementById('searchInput').addEventListener('input', (e) => {
+                renderGrid(e.target.value);
+            });
         }
 
-        // --- RENDER ---
+        // --- RENDER ENGINE ---
         function renderFilters() {
             const cats = ['ALL', ...new Set(apps.map(a => a.category))];
             const container = document.getElementById('filter-bar');
@@ -352,10 +417,10 @@
             dataList.innerHTML = '';
 
             cats.forEach(c => {
-                const span = document.createElement('span');
+                const span = document.createElement('div');
                 span.className = `filter-tag ${c === currentFilter ? 'active' : ''}`;
                 span.innerText = c;
-                span.onclick = () => { currentFilter = c; renderFilters(); renderGrid(document.getElementById('searchInput').value); };
+                span.onclick = () => { currentFilter = c; renderFilters(); renderGrid(); };
                 container.appendChild(span);
 
                 if(c !== 'ALL') {
@@ -371,7 +436,7 @@
             container.innerHTML = '';
             const search = query.toLowerCase();
 
-            apps.forEach((app) => {
+            apps.forEach((app, index) => {
                 if (currentFilter !== 'ALL' && app.category !== currentFilter) return;
                 if (search && !app.name.toLowerCase().includes(search) && !app.desc.toLowerCase().includes(search)) return;
 
@@ -379,27 +444,32 @@
                 card.className = 'card';
                 card.innerHTML = `
                     <div class="card-header">
-                        <div class="card-icon">${app.icon || '#'}</div>
+                        <div class="card-icon">${app.icon || '⚡'}</div>
                         <div class="card-cat">${app.category}</div>
                     </div>
                     <div class="card-title">${app.name}</div>
                     <div class="card-desc">${app.desc}</div>
+                    
                     <a href="${app.link}" target="_blank" class="launch-link">INITIALIZE_APP</a>
+                    
                     <div class="admin-tools">
-                        <button class="btn" onclick="editApp(${app.id})">EDIT</button>
-                        <button class="btn btn-danger" onclick="deleteApp(${app.id})">DEL</button>
+                        <button class="btn" onclick="editApp(${index})">EDIT</button>
+                        <button class="btn btn-danger" onclick="deleteApp(${index})">DEL</button>
                     </div>
                 `;
                 container.appendChild(card);
             });
         }
 
-        // --- ADMIN ---
+        // --- ADMIN LOGIC ---
         function toggleAdmin() {
             if (document.body.classList.contains('admin-active')) return;
             const p = prompt("AUTH_KEY REQUIRED:");
-            if(p === "admin") document.body.classList.add('admin-active');
-            else alert("ACCESS_DENIED");
+            if(p === "admin") {
+                document.body.classList.add('admin-active');
+            } else {
+                alert("ACCESS_DENIED");
+            }
         }
 
         function logout() {
@@ -407,172 +477,175 @@
         }
 
         function initAddApp() {
+            // Full Reset
             document.getElementById('appForm').reset();
-            document.getElementById('edit-id').value = "new";
+            document.getElementById('edit-index').value = "-1";
             document.getElementById('modal-title').innerText = "NEW_APP_DEPLOYMENT";
             openModal('modal-app');
         }
 
-        function editApp(id) {
-            const app = apps.find(a => a.id === id);
-            if(!app) return;
-            
-            document.getElementById('edit-id').value = app.id;
-            document.getElementById('inp-link').value = app.link;
-            document.getElementById('inp-name').value = app.name;
-            document.getElementById('inp-cat').value = app.category;
-            document.getElementById('inp-icon').value = app.icon;
-            document.getElementById('inp-desc').value = app.desc;
+        function editApp(index) {
+            const d = apps[index];
+            document.getElementById('edit-index').value = index;
+            document.getElementById('inp-link').value = d.link;
+            document.getElementById('inp-name').value = d.name;
+            document.getElementById('inp-cat').value = d.category;
+            document.getElementById('inp-icon').value = d.icon;
+            document.getElementById('inp-desc').value = d.desc;
             document.getElementById('modal-title').innerText = "MODIFY_APP_CONFIG";
             openModal('modal-app');
         }
 
         function saveApp() {
-            const idVal = document.getElementById('edit-id').value;
+            const idx = parseInt(document.getElementById('edit-index').value);
             const newObj = {
-                id: idVal === "new" ? Date.now() : parseInt(idVal),
                 name: document.getElementById('inp-name').value,
                 link: document.getElementById('inp-link').value,
-                category: document.getElementById('inp-cat').value,
-                icon: document.getElementById('inp-icon').value || '⚡',
+                category: document.getElementById('inp-cat').value || "Uncategorized",
+                icon: document.getElementById('inp-icon').value || "⚡",
                 desc: document.getElementById('inp-desc').value
             };
 
             if(!newObj.name || !newObj.link) return alert("NAME_AND_LINK_REQUIRED");
 
-            if(idVal === "new") {
+            if(idx === -1) {
                 apps.push(newObj);
             } else {
-                const idx = apps.findIndex(a => a.id === parseInt(idVal));
-                if(idx !== -1) apps[idx] = newObj;
+                apps[idx] = newObj;
             }
             
             closeModal('modal-app');
-            renderFilters();
-            renderGrid(document.getElementById('searchInput').value);
+            // Force delay to ensure DOM update
+            setTimeout(() => {
+                renderFilters();
+                renderGrid();
+            }, 50);
         }
 
-        function deleteApp(id) {
+        function deleteApp(index) {
             if(confirm("CONFIRM_DELETION?")) {
-                apps = apps.filter(a => a.id !== id);
+                apps.splice(index, 1);
                 renderFilters();
-                renderGrid(document.getElementById('searchInput').value);
+                renderGrid();
             }
         }
 
-        // --- ROBUST FETCH (DOUBLE PROXY) ---
-        async function fetchMetadata() {
+        // --- SMART FETCH (METADATA + EMOJI GUESSER) ---
+        async function smartFetch() {
             const url = document.getElementById('inp-link').value;
             const btn = document.getElementById('fetch-btn');
-            if(!url) return;
-
+            
+            if(!url) return alert("ENTER_URL_FIRST");
+            
             btn.innerText = "⏳...";
-            btn.disabled = true;
-
+            
             try {
-                // Try Primary Proxy (AllOrigins)
-                let response = await fetchWithTimeout(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`, 5000);
-                let data = await response.json();
-                let html = data.contents;
+                // Using AllOrigins Proxy
+                const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`);
+                const data = await res.json();
+                
+                if (data.contents) {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(data.contents, "text/html");
 
-                if (!html) throw new Error("Primary proxy failed");
-                parseAndFill(html);
+                    // 1. Get Title
+                    const title = doc.querySelector('title')?.innerText || "";
+                    
+                    // 2. Get Description (Multiple Checks)
+                    const desc = doc.querySelector('meta[name="description"]')?.content || 
+                                 doc.querySelector('meta[property="og:description"]')?.content ||
+                                 doc.querySelector('meta[name="twitter:description"]')?.content || "";
 
-            } catch (err) {
-                console.warn("Primary proxy failed, trying backup...");
-                try {
-                    // Try Backup Proxy (CorsProxy)
-                    let response = await fetchWithTimeout(`https://corsproxy.io/?${encodeURIComponent(url)}`, 5000);
-                    let html = await response.text();
-                    parseAndFill(html);
-                } catch (err2) {
-                    alert("FETCH_FAILED: Network busy or URL blocked. Please enter details manually.");
+                    // Fill Fields
+                    if(title) document.getElementById('inp-name').value = title;
+                    if(desc) document.getElementById('inp-desc').value = desc;
+
+                    // 3. Smart Logic for Icon & Category
+                    guessMetadata(title || "");
+                } else {
+                    throw new Error("No Content");
                 }
+            } catch (e) {
+                console.error(e);
+                alert("FETCH_FAILED: PLEASE ENTER MANUALLY");
             }
-            
             btn.innerText = "FETCH";
-            btn.disabled = false;
         }
 
-        async function fetchWithTimeout(resource, timeout) {
-            const controller = new AbortController();
-            const id = setTimeout(() => controller.abort(), timeout);
-            const response = await fetch(resource, { signal: controller.signal });
-            clearTimeout(id);
-            return response;
-        }
+        function guessMetadata(text) {
+            const t = text.toLowerCase();
+            const cat = document.getElementById('inp-cat');
+            const icon = document.getElementById('inp-icon');
 
-        function parseAndFill(html) {
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, "text/html");
-
-            const title = doc.querySelector('title')?.innerText;
-            const desc = doc.querySelector('meta[name="description"]')?.content;
-            
-            // Emoji/Icon Attempt
-            let icon = '⚡'; 
-            // Look for favicon links
-            const iconLink = doc.querySelector('link[rel*="icon"]')?.href;
-            if(iconLink) {
-                // If it looks like an emoji url or similar, usage is hard. 
-                // We keep it simple: if title has emoji, use it.
-                // Regex for emoji in title
-                const emojiRegex = /\p{Emoji}/u;
-                if(emojiRegex.test(title)) {
-                    icon = title.match(emojiRegex)[0];
-                }
-            }
-
-            if(title) document.getElementById('inp-name').value = title;
-            if(desc) document.getElementById('inp-desc').value = desc;
-            document.getElementById('inp-icon').value = icon;
-
-            // Auto Category
-            if(title && !document.getElementById('inp-cat').value) {
-                const t = title.toLowerCase();
-                if(t.includes('money') || t.includes('wealth')) document.getElementById('inp-cat').value = "Finance";
-                else if(t.includes('tool')) document.getElementById('inp-cat').value = "Dev Tools";
-                else if(t.includes('study') || t.includes('quiz')) document.getElementById('inp-cat').value = "Education";
-                else document.getElementById('inp-cat').value = "Productivity";
+            // Category & Icon Map
+            if(t.includes('money') || t.includes('wealth') || t.includes('finance')) {
+                cat.value = "Finance"; icon.value = "💰";
+            } else if(t.includes('study') || t.includes('quiz') || t.includes('note')) {
+                cat.value = "Education"; icon.value = "🎓";
+            } else if(t.includes('drop') || t.includes('file') || t.includes('transfer')) {
+                cat.value = "Productivity"; icon.value = "🚀";
+            } else if(t.includes('tool') || t.includes('gen')) {
+                cat.value = "Dev Tools"; icon.value = "🛠️";
+            } else if(t.includes('qr')) {
+                cat.value = "Tools"; icon.value = "🔳";
             }
         }
 
-        // --- STABLE EXPORT ---
+        // --- BULLETPROOF EXPORT (Fallback Method) ---
         function exportCode() {
-            // 1. Reset UI to clean state
+            // Clean UI
             const wasAdmin = document.body.classList.contains('admin-active');
             document.body.classList.remove('admin-active');
             closeModal('modal-app');
 
-            // 2. Wait for UI transition (Crucial for clipboard stability)
-            setTimeout(() => {
-                try {
-                    let htmlContent = document.documentElement.outerHTML;
+            // Clone HTML
+            let htmlContent = document.documentElement.outerHTML;
 
-                    // 3. Inject DB
-                    const json = JSON.stringify(apps, null, 4);
-                    const pattern = /(\/\* DB_START \*\/)([\s\S]*?)(\/\* DB_END \*\/)/;
-                    const finalCode = htmlContent.replace(pattern, `$1\n        let apps = ${json};\n        $3`);
+            // Restore UI
+            if(wasAdmin) document.body.classList.add('admin-active');
 
-                    // 4. Restore Admin
-                    if(wasAdmin) document.body.classList.add('admin-active');
+            // Inject Data
+            const json = JSON.stringify(apps, null, 4);
+            const pattern = /(\/\* DB_START \*\/)([\s\S]*?)(\/\* DB_END \*\/)/;
+            const finalCode = htmlContent.replace(pattern, `$1\n        let apps = ${json};\n        $3`);
+            
+            // EXECUTE COPY (Robust Method)
+            forceCopy("<!DOCTYPE html>\n" + finalCode, "SYSTEM_CODE_EXPORTED");
+        }
 
-                    // 5. Copy
-                    navigator.clipboard.writeText("<!DOCTYPE html>\n" + finalCode)
-                        .then(() => alert("✅ SUCCESS: Code copied! Update GitHub."))
-                        .catch(() => prompt("Clipboard failed. Copy code manually:", "<!DOCTYPE html>\n" + finalCode));
+        // Robust Copy Function (Works even if Clipboard API fails)
+        function forceCopy(text, successMsg = "COPIED") {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => alert(successMsg))
+                .catch(() => legacyCopy(text, successMsg));
+            } else {
+                legacyCopy(text, successMsg);
+            }
+        }
 
-                } catch (e) {
-                    alert("Export Error: " + e.message);
-                }
-            }, 300);
+        function legacyCopy(text, successMsg) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";
+            textArea.style.left = "-9999px";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                alert(successMsg);
+            } catch (err) {
+                alert("COPY FAILED. PERMISSION DENIED.");
+            }
+            document.body.removeChild(textArea);
         }
 
         // --- UTILS ---
         function openModal(id) { document.getElementById(id).classList.add('open'); }
         function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-        function copy(txt) { navigator.clipboard.writeText(txt); alert("COPIED: " + txt); }
 
+        // Start
         init();
     </script>
 </body>
