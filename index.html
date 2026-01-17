@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>H24_NEXUS // SYSTEM</title>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
@@ -20,7 +20,7 @@
             --font: 'JetBrains Mono', monospace;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
 
         body {
             background-color: var(--bg);
@@ -30,6 +30,7 @@
             display: flex;
             flex-direction: column;
             overflow-x: hidden;
+            /* Subtle grid background */
             background-image: 
                 linear-gradient(var(--surface) 1px, transparent 1px),
                 linear-gradient(90deg, var(--surface) 1px, transparent 1px);
@@ -43,15 +44,13 @@
         .btn {
             border: 1px solid var(--border);
             color: var(--text-dim);
-            padding: 10px 16px;
+            padding: 8px 16px;
             font-size: 0.8rem;
             text-transform: uppercase;
             letter-spacing: 1px;
             background: var(--bg);
-            white-space: nowrap;
         }
         .btn:hover { border-color: var(--text-main); color: var(--text-main); background: var(--surface-hover); }
-        .btn:active { transform: scale(0.98); }
         
         .btn-primary { border-color: var(--text-main); color: var(--text-main); font-weight: 700; }
         .btn-primary:hover { background: var(--text-main); color: var(--bg); }
@@ -67,12 +66,11 @@
             font-family: var(--font);
             width: 100%;
             font-size: 0.9rem;
-            border-radius: 0;
-            appearance: none;
+            transition: 0.2s;
         }
         input:focus, textarea:focus { border-color: var(--text-main); }
 
-        /* --- HEADER --- */
+        /* --- LAYOUT --- */
         header {
             position: sticky;
             top: 0;
@@ -80,52 +78,43 @@
             background: rgba(5, 5, 5, 0.9);
             backdrop-filter: blur(10px);
             border-bottom: 1px solid var(--border);
-            padding: 1rem 1.5rem;
+            padding: 1.5rem 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 15px;
         }
 
-        .brand { font-weight: 700; letter-spacing: -1px; font-size: 1.1rem; white-space: nowrap; }
+        .brand { font-weight: 700; letter-spacing: -1px; font-size: 1.2rem; }
         .brand span { color: var(--text-dim); }
 
-        .search-container { flex-grow: 1; max-width: 400px; display: flex; align-items: center; }
-        .search-input { border: none; border-bottom: 1px solid var(--border); background: transparent; padding: 5px; border-radius: 0; }
+        .search-container { flex-grow: 1; max-width: 400px; margin: 0 2rem; display: flex; align-items: center; }
+        .search-input { border: none; border-bottom: 1px solid var(--border); background: transparent; padding: 5px; }
         .search-input:focus { border-bottom-color: var(--text-main); }
 
-        /* --- ADMIN BAR (Mobile Optimized) --- */
+        /* --- ADMIN BAR --- */
         #admin-bar {
             display: none;
             background: var(--surface);
             border-bottom: 1px solid var(--border);
-            padding: 1rem;
-            flex-wrap: wrap;
-            gap: 10px;
-            align-items: center;
-            justify-content: space-between;
+            padding: 1rem 2rem;
         }
-        .admin-active #admin-bar { display: flex; }
-        .admin-label { color: var(--accent); font-size: 0.7rem; width: 100%; text-align: center; margin-bottom: 5px; }
-        .admin-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; width: 100%; }
+        .admin-active #admin-bar { display: flex; justify-content: space-between; align-items: center; }
 
         /* --- APP GRID --- */
         .grid-container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 1.5rem;
+            padding: 2rem;
             width: 100%;
         }
 
-        .filters { margin-bottom: 2rem; display: flex; gap: 1rem; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
-        .filters::-webkit-scrollbar { display: none; }
+        .filters { margin-bottom: 2rem; display: flex; gap: 1rem; overflow-x: auto; padding-bottom: 10px; }
         .filter-tag { 
             font-size: 0.75rem; 
             color: var(--text-dim); 
             cursor: pointer; 
-            padding: 5px 0;
+            padding-bottom: 2px;
             border-bottom: 1px solid transparent; 
-            white-space: nowrap;
         }
         .filter-tag.active { color: var(--text-main); border-bottom-color: var(--text-main); }
 
@@ -135,23 +124,22 @@
             gap: 20px;
         }
 
-        @media (max-width: 600px) {
-            .app-grid { grid-template-columns: 1fr; }
-            header { padding: 1rem; }
-            .search-container { display: none; } /* Hide search on very small screens if needed, or stack it */
-        }
-
-        /* --- CARD --- */
+        /* --- CARD DESIGN (ZEN) --- */
         .card {
             background: var(--bg);
             border: 1px solid var(--border);
             padding: 24px;
             display: flex;
             flex-direction: column;
+            transition: all 0.2s ease;
             position: relative;
         }
 
-        .card:hover { border-color: var(--text-dim); background: var(--surface); }
+        .card:hover {
+            border-color: var(--text-dim);
+            transform: translateY(-2px);
+            background: var(--surface);
+        }
 
         .card-header { display: flex; justify-content: space-between; margin-bottom: 1rem; }
         .card-icon { font-size: 1.5rem; filter: grayscale(100%); transition: 0.2s; }
@@ -167,59 +155,57 @@
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 1px;
-            display: block;
-            padding: 10px;
-            text-align: center;
-            border: 1px solid var(--border);
-            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
-        .launch-link:hover { background: var(--text-main); color: var(--bg); }
+        .launch-link::after { content: "->"; transition: 0.2s; }
+        .launch-link:hover::after { margin-left: 5px; }
 
-        /* Admin Tools */
+        /* --- ADMIN STATE VISIBILITY --- */
         .admin-tools { display: none; gap: 5px; margin-top: auto; }
+        
+        /* If Admin is Active: Hide Launch, Show Tools */
         .admin-active .launch-link { display: none; }
         .admin-active .admin-tools { display: grid; grid-template-columns: 1fr 1fr; }
 
         /* --- MODALS --- */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95);
+            background: rgba(0,0,0,0.9);
             z-index: 100;
             display: none;
             justify-content: center;
             align-items: center;
-            padding: 20px;
         }
         .modal-overlay.open { display: flex; }
 
         .modal {
             background: var(--bg);
             border: 1px solid var(--text-main);
-            width: 100%;
-            max-width: 500px;
+            width: 500px;
+            max-width: 90%;
             padding: 2rem;
             position: relative;
-            max-height: 90vh;
-            overflow-y: auto;
         }
-        .modal-header { font-size: 1.1rem; margin-bottom: 1.5rem; font-weight: 700; border-bottom: 1px solid var(--border); padding-bottom: 1rem; }
-        .close-btn { position: absolute; top: 1rem; right: 1rem; font-size: 1.5rem; color: var(--text-dim); padding: 5px; }
+        .modal-header { font-size: 1.2rem; margin-bottom: 2rem; font-weight: 700; border-bottom: 1px solid var(--border); padding-bottom: 1rem; }
+        .close-btn { position: absolute; top: 1rem; right: 1rem; font-size: 1.5rem; color: var(--text-dim); }
 
         .form-group { margin-bottom: 1.5rem; }
-        .form-label { display: block; font-size: 0.7rem; color: var(--text-dim); margin-bottom: 0.5rem; text-transform: uppercase; }
+        .form-label { display: block; font-size: 0.75rem; color: var(--text-dim); margin-bottom: 0.5rem; text-transform: uppercase; }
 
         /* --- QR AREA --- */
         .qr-display {
             background: #fff;
             padding: 10px;
-            width: 180px;
+            width: 200px;
             margin: 0 auto 20px;
         }
         .qr-display img { width: 100%; display: block; }
         .upi-row {
             border: 1px solid var(--border);
-            padding: 12px;
-            margin-bottom: 8px;
+            padding: 10px;
+            margin-bottom: 5px;
             font-size: 0.8rem;
             cursor: pointer;
             display: flex;
@@ -227,7 +213,7 @@
         }
         .upi-row:hover { border-color: var(--text-main); background: var(--surface); }
 
-        footer { text-align: center; padding: 3rem 1rem; color: var(--text-dim); font-size: 0.75rem; border-top: 1px solid var(--border); }
+        footer { text-align: center; padding: 3rem; color: var(--text-dim); font-size: 0.75rem; border-top: 1px solid var(--border); }
 
     </style>
 </head>
@@ -236,34 +222,36 @@
     <header>
         <div class="brand">H24<span>_NEXUS</span></div>
         <div class="search-container">
-            <span style="color:var(--text-dim); margin-right:5px;">></span>
+            <span style="color:var(--text-dim)">></span>
             <input type="text" id="searchInput" class="search-input" placeholder="search_system..." autocomplete="off">
         </div>
-        <div style="display:flex; gap:10px;">
+        <div style="display:flex; gap:1rem;">
             <button class="btn" onclick="openModal('modal-donate')">Donate</button>
             <button class="btn" onclick="toggleAdmin()">Admin</button>
         </div>
     </header>
 
     <div id="admin-bar">
-        <div class="admin-label">[ SYSTEM_ADMIN_ACTIVE ]</div>
-        <div class="admin-actions">
-            <button class="btn btn-primary" onclick="initAddApp()">+ New</button>
+        <span style="color:var(--accent); font-size:0.8rem;">[ ADMIN_MODE_ENGAGED ]</span>
+        <div style="display:flex; gap:10px;">
+            <button class="btn btn-primary" onclick="initAddApp()">+ New App</button>
             <button class="btn" style="border-color:var(--accent); color:var(--accent);" onclick="exportCode()">Save & Export</button>
             <button class="btn btn-danger" onclick="logout()">Exit</button>
         </div>
     </div>
 
     <div class="grid-container">
-        <div class="filters" id="filter-bar"></div>
+        <div class="filters" id="filter-bar">
+            </div>
 
-        <div class="app-grid" id="app-grid"></div>
+        <div class="app-grid" id="app-grid">
+            </div>
     </div>
 
     <footer>
-        SYSTEM ONLINE // H24 CREATIONZ
-        <br><br>
-        <a href="mailto:h24creationz@gmail.com">h24creationz@gmail.com</a>
+        H24 CREATIONZ // SYSTEM ONLINE
+        <br>
+        <a href="mailto:h24creationz@gmail.com" style="border-bottom:1px dotted #666; margin-top:10px; display:inline-block;">h24creationz@gmail.com</a>
     </footer>
 
     <div id="modal-app" class="modal-overlay">
@@ -278,7 +266,7 @@
                     <label class="form-label">Target URL</label>
                     <div style="display:flex; gap:10px;">
                         <input type="url" id="inp-link" placeholder="https://" required>
-                        <button type="button" class="btn" id="fetch-btn" onclick="smartFetch()">FETCH</button>
+                        <button type="button" class="btn" id="fetch-btn" onclick="fetchMetadata()">FETCH</button>
                     </div>
                 </div>
 
@@ -318,11 +306,11 @@
                 <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=8667701001@upi&pn=Harsha%20Varthan" alt="QR">
             </div>
 
-            <div class="upi-row" onclick="forceCopy('8667701001@upi')">
+            <div class="upi-row" onclick="copy('8667701001@upi')">
                 <span>8667701001@upi</span>
                 <span>[COPY]</span>
             </div>
-            <div class="upi-row" onclick="forceCopy('8667701001@yapl')">
+            <div class="upi-row" onclick="copy('8667701001@yapl')">
                 <span>8667701001@yapl</span>
                 <span>[COPY]</span>
             </div>
@@ -347,7 +335,7 @@
                 "name": "Exam Ready Pro",
                 "link": "https://harshavarthanep.github.io/Notes-to-Quizz/",
                 "category": "Education",
-                "icon": "📝",
+                "icon": "🧠",
                 "desc": "Convert notes to interactive quizzes for active recall."
             },
             {
@@ -397,11 +385,13 @@
 
         // --- SYSTEM STATE ---
         let currentFilter = 'ALL';
-
-        // --- INIT ---
+        
+        // --- INITIALIZATION ---
         function init() {
             renderFilters();
             renderGrid();
+            
+            // Global search listener
             document.getElementById('searchInput').addEventListener('input', (e) => {
                 renderGrid(e.target.value);
             });
@@ -417,12 +407,14 @@
             dataList.innerHTML = '';
 
             cats.forEach(c => {
-                const span = document.createElement('div');
+                // Top Bar
+                const span = document.createElement('span');
                 span.className = `filter-tag ${c === currentFilter ? 'active' : ''}`;
                 span.innerText = c;
                 span.onclick = () => { currentFilter = c; renderFilters(); renderGrid(); };
                 container.appendChild(span);
 
+                // Datalist for Forms
                 if(c !== 'ALL') {
                     const opt = document.createElement('option');
                     opt.value = c;
@@ -434,9 +426,11 @@
         function renderGrid(query = '') {
             const container = document.getElementById('app-grid');
             container.innerHTML = '';
+
             const search = query.toLowerCase();
 
             apps.forEach((app, index) => {
+                // Filter Logic
                 if (currentFilter !== 'ALL' && app.category !== currentFilter) return;
                 if (search && !app.name.toLowerCase().includes(search) && !app.desc.toLowerCase().includes(search)) return;
 
@@ -444,7 +438,7 @@
                 card.className = 'card';
                 card.innerHTML = `
                     <div class="card-header">
-                        <div class="card-icon">${app.icon || '⚡'}</div>
+                        <div class="card-icon">${app.icon || '#'}</div>
                         <div class="card-cat">${app.category}</div>
                     </div>
                     <div class="card-title">${app.name}</div>
@@ -476,8 +470,8 @@
             document.body.classList.remove('admin-active');
         }
 
+        // --- CRUD OPERATIONS ---
         function initAddApp() {
-            // Full Reset
             document.getElementById('appForm').reset();
             document.getElementById('edit-index').value = "-1";
             document.getElementById('modal-title').innerText = "NEW_APP_DEPLOYMENT";
@@ -501,11 +495,12 @@
             const newObj = {
                 name: document.getElementById('inp-name').value,
                 link: document.getElementById('inp-link').value,
-                category: document.getElementById('inp-cat').value || "Uncategorized",
-                icon: document.getElementById('inp-icon').value || "⚡",
+                category: document.getElementById('inp-cat').value,
+                icon: document.getElementById('inp-icon').value,
                 desc: document.getElementById('inp-desc').value
             };
 
+            // Validation
             if(!newObj.name || !newObj.link) return alert("NAME_AND_LINK_REQUIRED");
 
             if(idx === -1) {
@@ -515,11 +510,8 @@
             }
             
             closeModal('modal-app');
-            // Force delay to ensure DOM update
-            setTimeout(() => {
-                renderFilters();
-                renderGrid();
-            }, 50);
+            renderFilters();
+            renderGrid();
         }
 
         function deleteApp(index) {
@@ -530,120 +522,75 @@
             }
         }
 
-        // --- SMART FETCH (METADATA + EMOJI GUESSER) ---
-        async function smartFetch() {
+        // --- FETCH METADATA (Improved) ---
+        async function fetchMetadata() {
             const url = document.getElementById('inp-link').value;
             const btn = document.getElementById('fetch-btn');
             
-            if(!url) return alert("ENTER_URL_FIRST");
+            if(!url) return;
             
-            btn.innerText = "⏳...";
+            btn.innerText = "...";
             
             try {
-                // Using AllOrigins Proxy
                 const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`);
                 const data = await res.json();
                 
                 if (data.contents) {
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(data.contents, "text/html");
-
-                    // 1. Get Title
-                    const title = doc.querySelector('title')?.innerText || "";
+                    const doc = new DOMParser().parseFromString(data.contents, "text/html");
+                    const title = doc.querySelector('title')?.innerText;
+                    const desc = doc.querySelector('meta[name="description"]')?.content;
                     
-                    // 2. Get Description (Multiple Checks)
-                    const desc = doc.querySelector('meta[name="description"]')?.content || 
-                                 doc.querySelector('meta[property="og:description"]')?.content ||
-                                 doc.querySelector('meta[name="twitter:description"]')?.content || "";
-
-                    // Fill Fields
                     if(title) document.getElementById('inp-name').value = title;
                     if(desc) document.getElementById('inp-desc').value = desc;
-
-                    // 3. Smart Logic for Icon & Category
-                    guessMetadata(title || "");
-                } else {
-                    throw new Error("No Content");
+                    
+                    // Auto Category Guess
+                    if(title && !document.getElementById('inp-cat').value) {
+                         const t = title.toLowerCase();
+                         if(t.includes('money') || t.includes('wealth')) document.getElementById('inp-cat').value = "Finance";
+                         else if(t.includes('tool')) document.getElementById('inp-cat').value = "Tools";
+                         else document.getElementById('inp-cat').value = "Productivity";
+                    }
                 }
             } catch (e) {
                 console.error(e);
-                alert("FETCH_FAILED: PLEASE ENTER MANUALLY");
+                alert("FETCH_FAILED_MANUAL_ENTRY_REQUIRED");
             }
             btn.innerText = "FETCH";
         }
 
-        function guessMetadata(text) {
-            const t = text.toLowerCase();
-            const cat = document.getElementById('inp-cat');
-            const icon = document.getElementById('inp-icon');
-
-            // Category & Icon Map
-            if(t.includes('money') || t.includes('wealth') || t.includes('finance')) {
-                cat.value = "Finance"; icon.value = "💰";
-            } else if(t.includes('study') || t.includes('quiz') || t.includes('note')) {
-                cat.value = "Education"; icon.value = "🎓";
-            } else if(t.includes('drop') || t.includes('file') || t.includes('transfer')) {
-                cat.value = "Productivity"; icon.value = "🚀";
-            } else if(t.includes('tool') || t.includes('gen')) {
-                cat.value = "Dev Tools"; icon.value = "🛠️";
-            } else if(t.includes('qr')) {
-                cat.value = "Tools"; icon.value = "🔳";
-            }
-        }
-
-        // --- BULLETPROOF EXPORT (Fallback Method) ---
+        // --- EXPORT ENGINE (REBUILT FOR RELIABILITY) ---
         function exportCode() {
-            // Clean UI
+            // 1. Reset UI State before copying (Close modals, admin panels)
             const wasAdmin = document.body.classList.contains('admin-active');
             document.body.classList.remove('admin-active');
             closeModal('modal-app');
+            closeModal('modal-donate');
 
-            // Clone HTML
+            // 2. Clone the current HTML
             let htmlContent = document.documentElement.outerHTML;
 
-            // Restore UI
+            // 3. Restore Admin State for the user immediately so they don't get confused
             if(wasAdmin) document.body.classList.add('admin-active');
 
-            // Inject Data
+            // 4. Inject the current MEMORY apps array into the HTML string
+            // We search for the specific markers /* DB_START */ and /* DB_END */
             const json = JSON.stringify(apps, null, 4);
             const pattern = /(\/\* DB_START \*\/)([\s\S]*?)(\/\* DB_END \*\/)/;
+            
             const finalCode = htmlContent.replace(pattern, `$1\n        let apps = ${json};\n        $3`);
-            
-            // EXECUTE COPY (Robust Method)
-            forceCopy("<!DOCTYPE html>\n" + finalCode, "SYSTEM_CODE_EXPORTED");
-        }
 
-        // Robust Copy Function (Works even if Clipboard API fails)
-        function forceCopy(text, successMsg = "COPIED") {
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(text).then(() => alert(successMsg))
-                .catch(() => legacyCopy(text, successMsg));
-            } else {
-                legacyCopy(text, successMsg);
-            }
-        }
-
-        function legacyCopy(text, successMsg) {
-            const textArea = document.createElement("textarea");
-            textArea.value = text;
-            textArea.style.position = "fixed";
-            textArea.style.left = "-9999px";
-            document.body.appendChild(textArea);
-            textArea.focus();
-            textArea.select();
-            
-            try {
-                document.execCommand('copy');
-                alert(successMsg);
-            } catch (err) {
-                alert("COPY FAILED. PERMISSION DENIED.");
-            }
-            document.body.removeChild(textArea);
+            // 5. Copy
+            navigator.clipboard.writeText("<!DOCTYPE html>\n" + finalCode).then(() => {
+                alert("SYSTEM_SAVED_TO_CLIPBOARD");
+            }).catch(err => {
+                alert("COPY_FAILED");
+            });
         }
 
         // --- UTILS ---
         function openModal(id) { document.getElementById(id).classList.add('open'); }
         function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+        function copy(txt) { navigator.clipboard.writeText(txt); alert("COPIED"); }
 
         // Start
         init();
