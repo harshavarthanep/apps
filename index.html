@@ -36,6 +36,23 @@
             background-size: 40px 40px;
         }
 
+        /* --- ANIMATIONS --- */
+        @keyframes cardEntry {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0.2); border-color: var(--border); color: var(--text-dim); }
+            50% { box-shadow: 0 0 10px 0 rgba(0, 255, 0, 0.4); border-color: var(--accent); color: var(--accent); text-shadow: 0 0 5px var(--accent); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0.2); border-color: var(--border); color: var(--text-dim); }
+        }
+
+        @keyframes modalPop {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
         /* --- UI ELEMENTS --- */
         button { cursor: pointer; font-family: var(--font); border: none; background: none; transition: 0.2s; }
         a { text-decoration: none; color: inherit; }
@@ -49,8 +66,25 @@
             letter-spacing: 1px;
             background: var(--bg);
             white-space: nowrap;
+            position: relative;
+            overflow: hidden;
         }
         .btn:hover { border-color: var(--text-main); color: var(--text-main); background: var(--surface-hover); }
+        
+        /* New: Donate Attraction */
+        .btn-donate {
+            animation: pulseGlow 2.5s infinite ease-in-out;
+            font-weight: 700;
+        }
+
+        /* New: Icon Button Style */
+        .btn-icon {
+            padding: 8px 12px;
+            font-size: 1.2rem;
+            line-height: 1;
+            opacity: 0.6;
+        }
+        .btn-icon:hover { opacity: 1; border-color: var(--text-main); }
         
         .btn-primary { border-color: var(--text-main); color: var(--text-main); font-weight: 700; }
         .btn-primary:hover { background: var(--text-main); color: var(--bg); }
@@ -110,6 +144,7 @@
             padding: 1rem 2rem;
             flex-wrap: wrap;
             gap: 10px;
+            animation: cardEntry 0.3s ease-out;
         }
         .admin-active #admin-bar { display: flex; justify-content: space-between; align-items: center; }
 
@@ -117,7 +152,8 @@
         .grid-container { max-width: 1200px; margin: 0 auto; padding: 2rem; width: 100%; }
 
         .filters { margin-bottom: 2rem; display: flex; gap: 1rem; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
-        .filter-tag { font-size: 0.75rem; color: var(--text-dim); cursor: pointer; padding-bottom: 4px; border-bottom: 1px solid transparent; white-space: nowrap; }
+        .filter-tag { font-size: 0.75rem; color: var(--text-dim); cursor: pointer; padding-bottom: 4px; border-bottom: 1px solid transparent; white-space: nowrap; transition: 0.2s; }
+        .filter-tag:hover { color: var(--text-main); }
         .filter-tag.active { color: var(--text-main); border-bottom-color: var(--text-main); }
 
         .app-grid {
@@ -135,12 +171,20 @@
             flex-direction: column;
             transition: all 0.2s ease;
             position: relative;
+            /* Animation Setup */
+            opacity: 0; /* Start hidden for JS staggered fade-in */
+            animation: cardEntry 0.5s cubic-bezier(0.1, 0.7, 1.0, 0.1) forwards;
         }
-        .card:hover { border-color: var(--text-dim); transform: translateY(-2px); background: var(--surface); }
+        .card:hover { 
+            border-color: var(--text-dim); 
+            transform: translateY(-4px); /* Slightly more lift */
+            background: var(--surface); 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
 
         .card-header { display: flex; justify-content: space-between; margin-bottom: 1rem; }
-        .card-icon { font-size: 1.5rem; filter: grayscale(100%); transition: 0.2s; }
-        .card:hover .card-icon { filter: grayscale(0%); }
+        .card-icon { font-size: 1.5rem; filter: grayscale(100%); transition: 0.3s; }
+        .card:hover .card-icon { filter: grayscale(0%); transform: scale(1.1); }
         .card-cat { font-size: 0.6rem; text-transform: uppercase; color: var(--text-dim); border: 1px solid var(--border); padding: 2px 6px; height: fit-content; }
 
         .card-title { font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; }
@@ -148,24 +192,35 @@
 
         .launch-link { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 5px; }
         .launch-link::after { content: "->"; transition: 0.2s; }
-        .launch-link:hover::after { margin-left: 5px; }
+        .launch-link:hover::after { margin-left: 5px; color: var(--accent); }
 
         .admin-tools { display: none; gap: 5px; margin-top: auto; grid-template-columns: 1fr 1fr; }
         .admin-active .launch-link { display: none; }
         .admin-active .admin-tools { display: grid; }
 
         /* --- MODALS --- */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); z-index: 100; display: none; justify-content: center; align-items: center; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); z-index: 100; display: none; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
         .modal-overlay.open { display: flex; }
-        .modal { background: var(--bg); border: 1px solid var(--text-main); width: 500px; max-width: 90%; padding: 2rem; position: relative; }
-        .close-btn { position: absolute; top: 1rem; right: 1rem; font-size: 1.5rem; color: var(--text-dim); }
+        .modal { 
+            background: var(--bg); 
+            border: 1px solid var(--text-main); 
+            width: 500px; 
+            max-width: 90%; 
+            padding: 2rem; 
+            position: relative;
+            animation: modalPop 0.3s ease-out; /* Pop animation */
+        }
+        .close-btn { position: absolute; top: 1rem; right: 1rem; font-size: 1.5rem; color: var(--text-dim); transition: 0.2s; }
+        .close-btn:hover { color: var(--danger); }
+        
         .form-label { display: block; font-size: 0.75rem; color: var(--text-dim); margin-bottom: 0.5rem; text-transform: uppercase; }
         .form-group { margin-bottom: 1.5rem; }
 
-        .qr-display { background: #fff; padding: 10px; width: 200px; margin: 0 auto 20px; }
+        .qr-display { background: #fff; padding: 10px; width: 200px; margin: 0 auto 20px; transition: 0.3s; }
+        .qr-display:hover { transform: scale(1.05); }
         .qr-display img { width: 100%; display: block; }
-        .upi-row { border: 1px solid var(--border); padding: 10px; margin-bottom: 5px; font-size: 0.8rem; cursor: pointer; display: flex; justify-content: space-between; }
-        .upi-row:hover { border-color: var(--text-main); background: var(--surface); }
+        .upi-row { border: 1px solid var(--border); padding: 10px; margin-bottom: 5px; font-size: 0.8rem; cursor: pointer; display: flex; justify-content: space-between; transition: 0.2s; }
+        .upi-row:hover { border-color: var(--text-main); background: var(--surface); color: var(--accent); }
 
         footer { text-align: center; padding: 3rem; color: var(--text-dim); font-size: 0.75rem; border-top: 1px solid var(--border); }
     </style>
@@ -178,9 +233,9 @@
             <span style="color:var(--text-dim)">></span>
             <input type="text" id="searchInput" class="search-input" placeholder="search_system..." autocomplete="off">
         </div>
-        <div class="action-buttons" style="display:flex; gap:1rem;">
-            <button class="btn" onclick="openModal('modal-donate')">Donate</button>
-            <button class="btn" onclick="toggleAdmin()">Admin</button>
+        <div class="action-buttons" style="display:flex; gap:1rem; align-items: center;">
+            <button class="btn btn-donate" onclick="openModal('modal-donate')">Donate</button>
+            <button class="btn btn-icon" onclick="toggleAdmin()" title="Admin Login">🔒</button>
         </div>
     </header>
 
@@ -362,12 +417,18 @@
             container.innerHTML = '';
             const search = query.toLowerCase();
 
+            let delayCounter = 0; // For staggered animation
+
             apps.forEach((app, index) => {
                 if (currentFilter !== 'ALL' && app.category !== currentFilter) return;
                 if (search && !app.name.toLowerCase().includes(search) && !app.desc.toLowerCase().includes(search)) return;
 
                 const card = document.createElement('div');
                 card.className = 'card';
+                // Add staggered animation delay
+                card.style.animationDelay = `${delayCounter * 0.05}s`;
+                delayCounter++;
+
                 card.innerHTML = `
                     <div class="card-header">
                         <div class="card-icon">${app.icon || '⚡'}</div>
@@ -437,7 +498,7 @@
             }
         }
 
-        // --- SMART AUTO FETCH (FIXED) ---
+        // --- SMART AUTO FETCH ---
         async function fetchMetadata() {
             const url = document.getElementById('inp-link').value;
             const btn = document.getElementById('fetch-btn');
@@ -496,7 +557,6 @@
                 btn.innerText = "PROCESSING...";
 
                 // 1. Fetch ORIGINAL source file from server (Bypasses local DOM/Plugins)
-                // We append a timestamp to prevent caching old versions
                 const response = await fetch(window.location.href + '?t=' + Date.now());
                 if (!response.ok) throw new Error("Network response was not ok");
                 let sourceCode = await response.text();
