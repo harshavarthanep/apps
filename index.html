@@ -161,6 +161,10 @@
 
             .modal { width: 95%; padding: 1.5rem; }
             .grid-container { padding: 1rem; }
+            
+            /* MOBILE FIX: Reduce padding and force single column to prevent right-side clipping */
+            .trending-wrapper { padding: 15px 15px 40px 15px !important; }
+            .trending-grid, .app-grid { grid-template-columns: 1fr !important; }
         }
 
         /* --- PREMIUM TRENDING SECTION --- */
@@ -168,7 +172,7 @@
             border: 1px solid #1a1a1a;
             border-top: 2px solid var(--accent);
             background: #080808;
-            padding: 25px 25px 45px 25px; /* Extra bottom padding for centered button */
+            padding: 25px 25px 45px 25px; 
             border-radius: 8px;
             margin-bottom: 3rem;
             position: relative;
@@ -207,7 +211,7 @@
             font-weight: 700;
             cursor: pointer;
             letter-spacing: 1px;
-            border-radius: 30px; /* Pill shape for premium feel */
+            border-radius: 30px; 
             transition: all 0.3s ease;
             box-shadow: 0 4px 12px rgba(0,0,0,0.4);
             z-index: 10;
@@ -573,7 +577,6 @@
                 }
             });
             
-            // Professional JS approach: Only render what's needed instead of CSS hacks
             const appsToShow = isTrendingExpanded ? trendingApps : trendingApps.slice(0, 3);
             
             appsToShow.forEach(app => {
@@ -607,14 +610,12 @@
             
             if(isTrendingExpanded) {
                 btn.innerText = "COLLAPSE [-]";
-                // Scroll down slightly so the user sees the newly expanded items
                 setTimeout(() => {
                     const y = section.getBoundingClientRect().bottom + window.scrollY - window.innerHeight + 50;
                     window.scrollTo({top: y, behavior: 'smooth'});
                 }, 50);
             } else {
                 btn.innerText = "EXPAND [+]";
-                // Professional Scroll Landing: Calculates EXACT top position accounting for your sticky header
                 setTimeout(() => {
                     const y = section.getBoundingClientRect().top + window.scrollY - headerHeight - 20; 
                     window.scrollTo({top: y, behavior: 'smooth'});
@@ -651,11 +652,9 @@
             container.innerHTML = '';
             const search = query.toLowerCase();
 
-            // Smooth JS-based visibility toggle to prevent abrupt jumping
             if (currentFilter !== 'ALL' || search !== '') {
                 trendingSection.style.opacity = '0';
                 setTimeout(() => { 
-                    // Verify filter is still active before setting display none (in case user types fast)
                     if(currentFilter !== 'ALL' || document.getElementById('searchInput').value !== '') {
                         trendingSection.style.display = 'none'; 
                     }
