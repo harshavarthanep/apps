@@ -37,8 +37,6 @@
         }
 
         /* --- ANIMATIONS --- */
-        
-        /* NEW: Holographic Snap Animation */
         @keyframes holoSnap {
             0% { 
                 opacity: 0; 
@@ -54,6 +52,11 @@
                 opacity: 1; 
                 transform: perspective(1000px) translateZ(0) scale(1); 
             }
+        }
+
+        @keyframes holoFadeOut {
+            from { opacity: 1; transform: perspective(1000px) translateZ(0) scale(1); }
+            to { opacity: 0; transform: perspective(1000px) translateZ(-30px) scale(0.95); filter: blur(4px); }
         }
 
         @keyframes pulseGlow {
@@ -88,23 +91,12 @@
             gap: 8px;
         }
         .btn:hover { border-color: var(--text-main); color: var(--text-main); background: var(--surface-hover); }
-        
-        .btn-donate {
-            animation: pulseGlow 2.5s infinite ease-in-out;
-            font-weight: 700;
-        }
 
-        .btn-icon-only {
-            padding: 8px 12px;
-            font-size: 1.2rem;
-            line-height: 1;
-            opacity: 0.6;
-        }
+        .btn-donate { animation: pulseGlow 2.5s infinite ease-in-out; font-weight: 700; }
+        .btn-icon-only { padding: 8px 12px; font-size: 1.2rem; line-height: 1; opacity: 0.6; }
         .btn-icon-only:hover { opacity: 1; border-color: var(--text-main); }
-        
         .btn-primary { border-color: var(--text-main); color: var(--text-main); font-weight: 700; }
         .btn-primary:hover { background: var(--text-main); color: var(--bg); }
-        
         .btn-danger { color: var(--danger); border-color: #331111; }
         .btn-danger:hover { border-color: var(--danger); background: #331111; }
 
@@ -143,7 +135,6 @@
         .search-input { border: none; border-bottom: 1px solid var(--border); background: transparent; padding: 5px; width: 100%; }
         .search-input:focus { border-bottom-color: var(--text-main); }
 
-        /* --- ADMIN BAR --- */
         #admin-bar {
             display: none;
             background: var(--surface);
@@ -153,27 +144,72 @@
             animation: modalPop 0.3s ease-out;
         }
         .admin-active #admin-bar { display: flex; justify-content: space-between; align-items: center; }
-        
-        /* Mobile Admin Button Logic */
+
         .desktop-text { display: inline; }
         .mobile-icon { display: none; }
 
-        /* --- MOBILE OPTIMIZATION --- */
         @media (max-width: 768px) {
             header { padding: 1rem; flex-direction: row; gap: 10px; }
             .brand { font-size: 1rem; }
             .search-container { order: 3; width: 100%; margin: 5px 0 0 0; min-width: 0; }
             .action-buttons { margin-left: auto; }
-            
-            /* Admin Bar Mobile Tweaks */
+
             #admin-bar { padding: 0.8rem 1rem; }
             .desktop-text { display: none; }
             .mobile-icon { display: inline; font-size: 1.1rem; }
             .admin-actions .btn { padding: 8px 12px; }
-            
+
             .modal { width: 95%; padding: 1.5rem; }
             .grid-container { padding: 1rem; }
         }
+
+        /* --- NEW: TRENDING SECTION --- */
+        .trending-wrapper {
+            border: 1px dashed var(--accent);
+            padding: 20px;
+            margin-bottom: 2rem;
+            position: relative;
+            background: linear-gradient(180deg, rgba(0, 255, 0, 0.03) 0%, transparent 100%);
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+        .trending-header {
+            color: var(--accent);
+            font-weight: 700;
+            margin-bottom: 15px;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .trending-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+        @media (max-width: 768px) {
+            .trending-grid { grid-template-columns: 1fr; }
+        }
+        .trending-grid.collapsed > .card:nth-child(n+4) {
+            display: none;
+        }
+        .btn-expand {
+            position: absolute;
+            bottom: -15px;
+            right: 20px;
+            background: var(--bg);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 6px 15px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: 0.2s;
+        }
+        .btn-expand:hover { background: var(--accent); color: var(--bg); }
 
         /* --- GRID --- */
         .grid-container { max-width: 1200px; margin: 0 auto; padding: 2rem; width: 100%; }
@@ -189,7 +225,7 @@
             gap: 20px;
         }
 
-        /* --- CARD --- */
+        /* --- CARD & SCROLL ANIMATION --- */
         .card {
             background: var(--bg);
             border: 1px solid var(--border);
@@ -198,11 +234,17 @@
             flex-direction: column;
             transition: all 0.2s ease;
             position: relative;
-            /* Animation Setup */
-            opacity: 0; 
-            /* Using the new holoSnap animation */
+            opacity: 0; /* Hidden by default for scroll observer */
+        }
+        
+        /* Observer Trigger Classes */
+        .card.in-view {
             animation: holoSnap 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
         }
+        .card.out-view {
+            animation: holoFadeOut 0.4s ease-in forwards;
+        }
+
         .card:hover { 
             border-color: var(--text-dim); 
             transform: translateY(-4px) scale(1.01); 
@@ -241,7 +283,7 @@
         }
         .close-btn { position: absolute; top: 1rem; right: 1rem; font-size: 1.5rem; color: var(--text-dim); transition: 0.2s; }
         .close-btn:hover { color: var(--danger); }
-        
+
         .form-label { display: block; font-size: 0.75rem; color: var(--text-dim); margin-bottom: 0.5rem; text-transform: uppercase; }
         .form-group { margin-bottom: 1.5rem; }
 
@@ -287,6 +329,14 @@
     </div>
 
     <div class="grid-container">
+        <div id="trending-section" class="trending-wrapper">
+            <div class="trending-header">
+                <span style="font-size: 1.2rem;">🔥</span> NEW_RELEASES // TRENDING
+            </div>
+            <div class="trending-grid collapsed" id="trending-grid"></div>
+            <button class="btn-expand" id="expand-btn" onclick="toggleTrending()">EXPAND [+]</button>
+        </div>
+
         <div class="filters" id="filter-bar"></div>
         <div class="app-grid" id="app-grid"></div>
     </div>
@@ -301,10 +351,10 @@
         <div class="modal">
             <button class="close-btn" onclick="closeModal('modal-app')">×</button>
             <div style="font-size:1.2rem; font-weight:700; margin-bottom:1.5rem; border-bottom:1px solid #333; padding-bottom:10px;">CONFIGURE_APP</div>
-            
+
             <form id="appForm">
                 <input type="hidden" id="edit-index">
-                
+
                 <div class="form-group">
                     <label class="form-label">Target URL (Auto-Fetch Enabled)</label>
                     <div style="display:flex; gap:10px;">
@@ -467,20 +517,79 @@
         ];
         /* DB_END */
 
+        // --- SCROLL OBSERVER (FADE IN/OUT) ---
+        const scrollObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.remove('out-view');
+                    entry.target.classList.add('in-view');
+                } else {
+                    if (entry.target.classList.contains('in-view')) {
+                        entry.target.classList.remove('in-view');
+                        entry.target.classList.add('out-view');
+                    }
+                }
+            });
+        }, { threshold: 0.1 });
+
         // --- INIT ---
         let currentFilter = 'ALL';
-        
+
         function init() {
             renderFilters();
+            renderTrending();
             renderGrid();
             document.getElementById('searchInput').addEventListener('input', (e) => renderGrid(e.target.value));
+        }
+
+        // --- TRENDING LOGIC ---
+        function renderTrending() {
+            const container = document.getElementById('trending-grid');
+            container.innerHTML = '';
+            
+            // Gets the 6 most recently added apps
+            const trendingApps = [...apps].map((app, index) => ({...app, originalIndex: index})).reverse().slice(0, 6);
+            
+            trendingApps.forEach(app => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="card-header">
+                        <div class="card-icon">${app.icon || '⚡'}</div>
+                        <div class="card-cat">${app.category}</div>
+                    </div>
+                    <div class="card-title">${app.name}</div>
+                    <div class="card-desc">${app.desc}</div>
+                    <a href="${app.link}" target="_blank" class="launch-link">INITIALIZE_APP</a>
+                    <div class="admin-tools">
+                        <button class="btn" onclick="editApp(${app.originalIndex})">EDIT</button>
+                        <button class="btn btn-danger" onclick="deleteApp(${app.originalIndex})">DEL</button>
+                    </div>
+                `;
+                container.appendChild(card);
+                scrollObserver.observe(card);
+            });
+        }
+
+        let isTrendingExpanded = false;
+        function toggleTrending() {
+            const grid = document.getElementById('trending-grid');
+            const btn = document.getElementById('expand-btn');
+            isTrendingExpanded = !isTrendingExpanded;
+            if(isTrendingExpanded) {
+                grid.classList.remove('collapsed');
+                btn.innerText = "COLLAPSE [-]";
+            } else {
+                grid.classList.add('collapsed');
+                btn.innerText = "EXPAND [+]";
+            }
         }
 
         function renderFilters() {
             const cats = ['ALL', ...new Set(apps.map(a => a.category))];
             const container = document.getElementById('filter-bar');
             const dataList = document.getElementById('cat-list');
-            
+
             container.innerHTML = '';
             dataList.innerHTML = '';
 
@@ -490,7 +599,7 @@
                 span.innerText = c;
                 span.onclick = () => { currentFilter = c; renderFilters(); renderGrid(); };
                 container.appendChild(span);
-                
+
                 if(c !== 'ALL') {
                     const opt = document.createElement('option');
                     opt.value = c;
@@ -501,10 +610,16 @@
 
         function renderGrid(query = '') {
             const container = document.getElementById('app-grid');
+            const trendingSection = document.getElementById('trending-section');
             container.innerHTML = '';
             const search = query.toLowerCase();
 
-            let delayCounter = 0; // For staggered animation
+            // Toggle Trending Section Visibility based on filters/search
+            if (currentFilter !== 'ALL' || search !== '') {
+                trendingSection.style.display = 'none';
+            } else {
+                trendingSection.style.display = 'block';
+            }
 
             apps.forEach((app, index) => {
                 if (currentFilter !== 'ALL' && app.category !== currentFilter) return;
@@ -512,10 +627,6 @@
 
                 const card = document.createElement('div');
                 card.className = 'card';
-                // STAGGERED ANIMATION DELAY
-                card.style.animationDelay = `${delayCounter * 0.05}s`;
-                delayCounter++;
-
                 card.innerHTML = `
                     <div class="card-header">
                         <div class="card-icon">${app.icon || '⚡'}</div>
@@ -530,6 +641,7 @@
                     </div>
                 `;
                 container.appendChild(card);
+                scrollObserver.observe(card); // Attach scroll animation observer
             });
         }
 
@@ -571,9 +683,10 @@
 
             if(idx === -1) apps.push(newObj);
             else apps[idx] = newObj;
-            
+
             closeModal('modal-app');
             renderFilters();
+            renderTrending();
             renderGrid();
         }
 
@@ -581,6 +694,7 @@
             if(confirm("CONFIRM_DELETION?")) {
                 apps.splice(index, 1);
                 renderFilters();
+                renderTrending();
                 renderGrid();
             }
         }
@@ -590,28 +704,22 @@
             const url = document.getElementById('inp-link').value;
             const btn = document.getElementById('fetch-btn');
             if(!url) return;
-            
+
             btn.innerText = "⏳...";
-            
+
             try {
-                // Fetch via Proxy
                 const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`);
                 const data = await res.json();
-                
+
                 if (data.contents) {
                     const doc = new DOMParser().parseFromString(data.contents, "text/html");
-                    
-                    // 1. Get Title
                     const title = doc.querySelector('title')?.innerText || "";
-                    
-                    // 2. Get Description (Robust check)
                     const desc = doc.querySelector('meta[name="description"]')?.content || 
                                  doc.querySelector('meta[property="og:description"]')?.content || "";
 
                     if(title) document.getElementById('inp-name').value = title;
                     if(desc) document.getElementById('inp-desc').value = desc;
 
-                    // 3. Smart Emoji & Category Guesser
                     const t = (title + " " + desc).toLowerCase();
                     const catInp = document.getElementById('inp-cat');
                     const iconInp = document.getElementById('inp-icon');
@@ -636,41 +744,34 @@
             btn.innerText = "FETCH";
         }
 
-        // --- CLEAN EXPORT (NO EXTENSIONS) ---
+        // --- CLEAN EXPORT ---
         async function exportCode() {
             try {
-                // IMPORTANT: Select button specifically to avoid text replacement issues
                 const btn = document.querySelector('.admin-actions button[onclick="exportCode()"] .desktop-text');
                 const btnMobile = document.querySelector('.admin-actions button[onclick="exportCode()"] .mobile-icon');
-                
+
                 const originalText = btn ? btn.innerText : "Save & Export";
                 if(btn) btn.innerText = "SAVING...";
                 if(btnMobile) btnMobile.innerText = "⏳";
 
-                // 1. Fetch ORIGINAL source file from server
                 const response = await fetch(window.location.href + '?t=' + Date.now());
                 if (!response.ok) throw new Error("Network response was not ok");
                 let sourceCode = await response.text();
 
-                // 2. Prepare Data
                 const json = JSON.stringify(apps, null, 4);
-                
-                // 3. Regex Replacement
                 const pattern = /(\/\* DB_START \*\/)([\s\S]*?)(\/\* DB_END \*\/)/;
                 if(!pattern.test(sourceCode)) throw new Error("Markers not found");
-                
+
                 const finalCode = sourceCode.replace(pattern, `$1\n        let apps = ${json};\n        $3`);
 
-                // 4. Copy
                 await navigator.clipboard.writeText(finalCode);
                 alert("✅ SUCCESS: CODE COPIED!");
-                
+
                 if(btn) btn.innerText = originalText;
                 if(btnMobile) btnMobile.innerText = "💾";
 
             } catch (err) {
                 console.error(err);
-                // Fallback
                 alert("⚠️ FETCH FAILED (Local Mode?)\nTrying backup copy method...");
                 const backupHTML = document.documentElement.outerHTML
                     .replace(/let apps = \[([\s\S]*?)\];/, `let apps = ${JSON.stringify(apps)};`);
