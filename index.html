@@ -163,7 +163,7 @@
             .grid-container { padding: 1rem; }
         }
 
-        /* --- NEW: TRENDING SECTION --- */
+        /* --- TRENDING SECTION --- */
         .trending-wrapper {
             border: 1px dashed var(--accent);
             padding: 20px;
@@ -171,8 +171,23 @@
             position: relative;
             background: linear-gradient(180deg, rgba(0, 255, 0, 0.03) 0%, transparent 100%);
             border-radius: 4px;
-            transition: all 0.3s ease;
+            /* Smooth transitions for hiding/showing */
+            transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease, margin 0.4s ease, padding 0.4s ease;
+            max-height: 2500px; /* Arbitrary large height to allow expansion */
+            opacity: 1;
+            overflow: hidden;
         }
+        
+        .trending-wrapper.hidden-smooth {
+            max-height: 0;
+            opacity: 0;
+            margin-bottom: 0;
+            padding-top: 0;
+            padding-bottom: 0;
+            border-width: 0;
+            pointer-events: none;
+        }
+
         .trending-header {
             color: var(--accent);
             font-weight: 700;
@@ -208,6 +223,7 @@
             cursor: pointer;
             text-transform: uppercase;
             transition: 0.2s;
+            z-index: 5;
         }
         .btn-expand:hover { background: var(--accent); color: var(--bg); }
 
@@ -237,7 +253,6 @@
             opacity: 0; /* Hidden by default for scroll observer */
         }
         
-        /* Observer Trigger Classes */
         .card.in-view {
             animation: holoSnap 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
         }
@@ -329,6 +344,8 @@
     </div>
 
     <div class="grid-container">
+        <div class="filters" id="filter-bar"></div>
+
         <div id="trending-section" class="trending-wrapper">
             <div class="trending-header">
                 <span style="font-size: 1.2rem;">🔥</span> NEW_RELEASES // TRENDING
@@ -337,7 +354,6 @@
             <button class="btn-expand" id="expand-btn" onclick="toggleTrending()">EXPAND [+]</button>
         </div>
 
-        <div class="filters" id="filter-bar"></div>
         <div class="app-grid" id="app-grid"></div>
     </div>
 
@@ -517,6 +533,21 @@
         ];
         /* DB_END */
 
+        /* ================================================================
+           MANUAL TRENDING LIST
+           Add the exact 'name' of the apps you want featured here.
+           Order matters! (Supports up to 6 apps gracefully)
+           ================================================================
+        */
+        let trendingList = [
+            "NoirRain",
+            "InkBlade",
+            "InfinityDrop Turbo",
+            "BrandZen",
+            "DataViz Pro",
+            "ZenPDF"
+        ];
+
         // --- SCROLL OBSERVER (FADE IN/OUT) ---
         const scrollObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
@@ -547,8 +578,14 @@
             const container = document.getElementById('trending-grid');
             container.innerHTML = '';
             
-            // Gets the 6 most recently added apps
-            const trendingApps = [...apps].map((app, index) => ({...app, originalIndex: index})).reverse().slice(0, 6);
+            // Generate array based on manual trendingList config
+            let trendingApps = [];
+            trendingList.forEach(name => {
+                const found = apps.find(a => a.name === name);
+                if(found) {
+                    trendingApps.push({ ...found, originalIndex: apps.indexOf(found) });
+                }
+            });
             
             trendingApps.forEach(app => {
                 const card = document.createElement('div');
@@ -575,13 +612,21 @@
         function toggleTrending() {
             const grid = document.getElementById('trending-grid');
             const btn = document.getElementById('expand-btn');
+            const section = document.getElementById('trending-section');
+            
             isTrendingExpanded = !isTrendingExpanded;
             if(isTrendingExpanded) {
                 grid.classList.remove('collapsed');
                 btn.innerText = "COLLAPSE [-]";
+                // Smooth scroll to keep button/bottom in view when expanding
+                setTimeout(() => {
+                    btn.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                }, 150); // Small delay to let CSS expand first
             } else {
                 grid.classList.add('collapsed');
                 btn.innerText = "EXPAND [+]";
+                // Smooth scroll back to top of the trending section when collapsing
+                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         }
 
@@ -614,11 +659,11 @@
             container.innerHTML = '';
             const search = query.toLowerCase();
 
-            // Toggle Trending Section Visibility based on filters/search
+            // Smoothly Hide/Show Trending Section
             if (currentFilter !== 'ALL' || search !== '') {
-                trendingSection.style.display = 'none';
+                trendingSection.classList.add('hidden-smooth');
             } else {
-                trendingSection.style.display = 'block';
+                trendingSection.classList.remove('hidden-smooth');
             }
 
             apps.forEach((app, index) => {
