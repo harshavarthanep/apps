@@ -163,69 +163,61 @@
             .grid-container { padding: 1rem; }
         }
 
-        /* --- TRENDING SECTION --- */
+        /* --- PREMIUM TRENDING SECTION --- */
         .trending-wrapper {
-            border: 1px dashed var(--accent);
-            padding: 20px;
-            margin-bottom: 2rem;
+            border: 1px solid #1a1a1a;
+            border-top: 2px solid var(--accent);
+            background: #080808;
+            padding: 25px 25px 45px 25px; /* Extra bottom padding for centered button */
+            border-radius: 8px;
+            margin-bottom: 3rem;
             position: relative;
-            background: linear-gradient(180deg, rgba(0, 255, 0, 0.03) 0%, transparent 100%);
-            border-radius: 4px;
-            /* Smooth transitions for hiding/showing */
-            transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease, margin 0.4s ease, padding 0.4s ease;
-            max-height: 2500px; /* Arbitrary large height to allow expansion */
+            transition: opacity 0.3s ease;
             opacity: 1;
-            overflow: hidden;
         }
-        
-        .trending-wrapper.hidden-smooth {
-            max-height: 0;
-            opacity: 0;
-            margin-bottom: 0;
-            padding-top: 0;
-            padding-bottom: 0;
-            border-width: 0;
-            pointer-events: none;
-        }
-
         .trending-header {
-            color: var(--accent);
+            color: var(--text-dim);
             font-weight: 700;
-            margin-bottom: 15px;
-            font-size: 1rem;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
             text-transform: uppercase;
             letter-spacing: 2px;
             display: flex;
             align-items: center;
             gap: 10px;
         }
+        .trending-header span.icon { color: var(--accent); font-size: 1.1rem; }
+        
         .trending-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 20px;
         }
-        @media (max-width: 768px) {
-            .trending-grid { grid-template-columns: 1fr; }
-        }
-        .trending-grid.collapsed > .card:nth-child(n+4) {
-            display: none;
-        }
+
         .btn-expand {
             position: absolute;
-            bottom: -15px;
-            right: 20px;
+            bottom: -16px;
+            left: 50%;
+            transform: translateX(-50%);
             background: var(--bg);
-            border: 1px solid var(--accent);
-            color: var(--accent);
-            padding: 6px 15px;
+            border: 1px solid #333;
+            color: var(--text-dim);
+            padding: 8px 26px;
             font-size: 0.75rem;
             font-weight: 700;
             cursor: pointer;
-            text-transform: uppercase;
-            transition: 0.2s;
-            z-index: 5;
+            letter-spacing: 1px;
+            border-radius: 30px; /* Pill shape for premium feel */
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            z-index: 10;
         }
-        .btn-expand:hover { background: var(--accent); color: var(--bg); }
+        .btn-expand:hover { 
+            border-color: var(--accent); 
+            color: var(--accent); 
+            background: var(--surface-hover); 
+            box-shadow: 0 4px 15px rgba(0,255,0,0.15);
+        }
 
         /* --- GRID --- */
         .grid-container { max-width: 1200px; margin: 0 auto; padding: 2rem; width: 100%; }
@@ -250,15 +242,11 @@
             flex-direction: column;
             transition: all 0.2s ease;
             position: relative;
-            opacity: 0; /* Hidden by default for scroll observer */
+            opacity: 0; 
         }
         
-        .card.in-view {
-            animation: holoSnap 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-        }
-        .card.out-view {
-            animation: holoFadeOut 0.4s ease-in forwards;
-        }
+        .card.in-view { animation: holoSnap 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+        .card.out-view { animation: holoFadeOut 0.4s ease-in forwards; }
 
         .card:hover { 
             border-color: var(--text-dim); 
@@ -313,7 +301,7 @@
 </head>
 <body>
 
-    <header>
+    <header id="main-header">
         <div class="brand">H24<span>_NEXUS</span></div>
         <div class="search-container">
             <span style="color:var(--text-dim)">></span>
@@ -348,9 +336,9 @@
 
         <div id="trending-section" class="trending-wrapper">
             <div class="trending-header">
-                <span style="font-size: 1.2rem;">🔥</span> NEW_RELEASES // TRENDING
+                <span class="icon">🔥</span> NEW_RELEASES // TRENDING
             </div>
-            <div class="trending-grid collapsed" id="trending-grid"></div>
+            <div class="trending-grid" id="trending-grid"></div>
             <button class="btn-expand" id="expand-btn" onclick="toggleTrending()">EXPAND [+]</button>
         </div>
 
@@ -535,8 +523,6 @@
 
         /* ================================================================
            MANUAL TRENDING LIST
-           Add the exact 'name' of the apps you want featured here.
-           Order matters! (Supports up to 6 apps gracefully)
            ================================================================
         */
         let trendingList = [
@@ -565,6 +551,7 @@
 
         // --- INIT ---
         let currentFilter = 'ALL';
+        let isTrendingExpanded = false;
 
         function init() {
             renderFilters();
@@ -578,7 +565,6 @@
             const container = document.getElementById('trending-grid');
             container.innerHTML = '';
             
-            // Generate array based on manual trendingList config
             let trendingApps = [];
             trendingList.forEach(name => {
                 const found = apps.find(a => a.name === name);
@@ -587,7 +573,10 @@
                 }
             });
             
-            trendingApps.forEach(app => {
+            // Professional JS approach: Only render what's needed instead of CSS hacks
+            const appsToShow = isTrendingExpanded ? trendingApps : trendingApps.slice(0, 3);
+            
+            appsToShow.forEach(app => {
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.innerHTML = `
@@ -608,25 +597,28 @@
             });
         }
 
-        let isTrendingExpanded = false;
         function toggleTrending() {
-            const grid = document.getElementById('trending-grid');
+            isTrendingExpanded = !isTrendingExpanded;
             const btn = document.getElementById('expand-btn');
             const section = document.getElementById('trending-section');
+            const headerHeight = document.getElementById('main-header').offsetHeight;
             
-            isTrendingExpanded = !isTrendingExpanded;
+            renderTrending();
+            
             if(isTrendingExpanded) {
-                grid.classList.remove('collapsed');
                 btn.innerText = "COLLAPSE [-]";
-                // Smooth scroll to keep button/bottom in view when expanding
+                // Scroll down slightly so the user sees the newly expanded items
                 setTimeout(() => {
-                    btn.scrollIntoView({ behavior: 'smooth', block: 'end' });
-                }, 150); // Small delay to let CSS expand first
+                    const y = section.getBoundingClientRect().bottom + window.scrollY - window.innerHeight + 50;
+                    window.scrollTo({top: y, behavior: 'smooth'});
+                }, 50);
             } else {
-                grid.classList.add('collapsed');
                 btn.innerText = "EXPAND [+]";
-                // Smooth scroll back to top of the trending section when collapsing
-                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                // Professional Scroll Landing: Calculates EXACT top position accounting for your sticky header
+                setTimeout(() => {
+                    const y = section.getBoundingClientRect().top + window.scrollY - headerHeight - 20; 
+                    window.scrollTo({top: y, behavior: 'smooth'});
+                }, 50);
             }
         }
 
@@ -659,11 +651,18 @@
             container.innerHTML = '';
             const search = query.toLowerCase();
 
-            // Smoothly Hide/Show Trending Section
+            // Smooth JS-based visibility toggle to prevent abrupt jumping
             if (currentFilter !== 'ALL' || search !== '') {
-                trendingSection.classList.add('hidden-smooth');
+                trendingSection.style.opacity = '0';
+                setTimeout(() => { 
+                    // Verify filter is still active before setting display none (in case user types fast)
+                    if(currentFilter !== 'ALL' || document.getElementById('searchInput').value !== '') {
+                        trendingSection.style.display = 'none'; 
+                    }
+                }, 300);
             } else {
-                trendingSection.classList.remove('hidden-smooth');
+                trendingSection.style.display = 'block';
+                setTimeout(() => { trendingSection.style.opacity = '1'; }, 10);
             }
 
             apps.forEach((app, index) => {
@@ -686,7 +685,7 @@
                     </div>
                 `;
                 container.appendChild(card);
-                scrollObserver.observe(card); // Attach scroll animation observer
+                scrollObserver.observe(card);
             });
         }
 
