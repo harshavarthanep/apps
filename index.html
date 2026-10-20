@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>H24_NEXUS // SYSTEM</title>
+    <meta name="description" content="H24 Nexus by Harsha Varthan E P: free web apps, tools and games, plus client websites, product sites and browser extensions.">
+    <meta name="theme-color" content="#050505">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- ZEN / STEALTH THEME --- */
+        :root {
+            --bg: #050505;
+            --surface: #0a0a0a;
+            --surface-hover: #111111;
+            --border: #333333;
+            --border-active: #ffffff;
+            --text-main: #eeeeee;
+            --text-dim: #666666;
+            --accent: #00ff00;
+            --danger: #ff3333;
+            --font: 'JetBrains Mono', monospace;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: var(--font);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            background-image: 
+                linear-gradient(var(--surface) 1px, transparent 1px),
+                linear-gradient(90deg, var(--surface) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        /* --- ANIMATIONS --- */
+        @keyframes holoSnap {
+            0% { 
+                opacity: 0; 
+                transform: perspective(1000px) translateZ(-50px) scale(0.9); 
+                filter: blur(8px);
+            }
+            60% {
+                opacity: 1;
+                transform: perspective(1000px) translateZ(10px) scale(1.02);
+                filter: blur(0px);
+            }
+            100% { 
+                opacity: 1; 
+                transform: perspective(1000px) translateZ(0) scale(1); 
+            }
+        }
+
+        @keyframes holoFadeOut {
+            from { opacity: 1; transform: perspective(1000px) translateZ(0) scale(1); }
+            to { opacity: 0; transform: perspective(1000px) translateZ(-30px) scale(0.95); filter: blur(4px); }
+        }
+
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0.2); border-color: var(--border); color: var(--text-dim); }
+            50% { box-shadow: 0 0 10px 0 rgba(0, 255, 0, 0.4); border-color: var(--accent); color: var(--accent); text-shadow: 0 0 5px var(--accent); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0.2); border-color: var(--border); color: var(--text-dim); }
+        }
+
+        @keyframes modalPop {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* --- UI ELEMENTS --- */
+        button { cursor: pointer; font-family: var(--font); border: none; background: none; transition: 0.2s; }
+        a { text-decoration: none; color: inherit; }
+
+        .btn {
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            padding: 10px 18px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: var(--bg);
+            white-space: nowrap;
+            position: relative;
+            overflow: hidden;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn:hover { border-color: var(--text-main); color: var(--text-main); background: var(--surface-hover); }
+
+        .btn-donate { animation: pulseGlow 2.5s infinite ease-in-out; font-weight: 700; }
+        .btn-icon-only { padding: 8px 12px; font-size: 1.2rem; line-height: 1; opacity: 0.6; }
+        .btn-icon-only:hover { opacity: 1; border-color: var(--text-main); }
+        .btn-primary { border-color: var(--text-main); color: var(--text-main); font-weight: 700; }
+        .btn-primary:hover { background: var(--text-main); color: var(--bg); }
+        .btn-danger { color: var(--danger); border-color: #331111; }
+        .btn-danger:hover { border-color: var(--danger); background: #331111; }
+
+        input, textarea, select {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 12px;
+            font-family: var(--font);
+            width: 100%;
+            font-size: 0.9rem;
+            transition: 0.2s;
+        }
+        input:focus, textarea:focus, select:focus { border-color: var(--text-main); }
+        select { appearance: none; cursor: pointer; }
+        button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 1px solid var(--accent); outline-offset: 2px; }
+
+        /* --- LAYOUT --- */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: rgba(5, 5, 5, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .brand { font-weight: 700; letter-spacing: -1px; font-size: 1.2rem; white-space: nowrap; }
+        .brand span { color: var(--text-dim); }
+
+        .search-container { flex-grow: 1; margin: 0 1rem; display: flex; align-items: center; min-width: 200px; }
+        .search-input { border: none; border-bottom: 1px solid var(--border); background: transparent; padding: 5px; width: 100%; }
+        .search-input:focus { border-bottom-color: var(--text-main); }
+
+        #admin-bar {
+            display: none;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 0.8rem 2rem;
+            gap: 10px;
+            animation: modalPop 0.3s ease-out;
+        }
+        .admin-active #admin-bar { display: flex; justify-content: space-between; align-items: center; }
+
+        .desktop-text { display: inline; }
+        .mobile-icon { display: none; }
+
+        @media (max-width: 768px) {
+            header { padding: 1rem; flex-direction: row; gap: 10px; }
+            .brand { font-size: 1rem; }
+            .search-container { order: 3; width: 100%; margin: 5px 0 0 0; min-width: 0; }
+            .action-buttons { margin-left: auto; }
+
+            #admin-bar { padding: 0.8rem 1rem; }
+            .desktop-text { display: none; }
+            .mobile-icon { display: inline; font-size: 1.1rem; }
+            .admin-actions .btn { padding: 8px 12px; }
+
+            .modal { width: 95%; padding: 1.5rem; }
+            .grid-container { padding: 1rem; }
+            
+            /* MOBILE FIX: Reduce padding and force single column to prevent right-side clipping */
+            .trending-wrapper { padding: 15px 15px 40px 15px !important; }
+            .trending-grid, .app-grid { grid-template-columns: 1fr !important; }
+        }
+
+        /* --- PREMIUM TRENDING SECTION --- */
+        .trending-wrapper {
+            border: 1px solid #1a1a1a;
+            border-top: 2px solid var(--accent);
+            background: #080808;
+            padding: 25px 25px 45px 25px; 
+            border-radius: 8px;
+            margin-bottom: 3rem;
+            position: relative;
+            transition: opacity 0.3s ease;
+            opacity: 1;
+        }
+        .trending-header {
+            color: var(--text-dim);
+            font-weight: 700;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .trending-header span.icon { color: var(--accent); font-size: 1.1rem; }
+        
+        .trending-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .btn-expand {
+            position: absolute;
+            bottom: -16px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg);
+            border: 1px solid #333;
+            color: var(--text-dim);
+            padding: 8px 26px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            letter-spacing: 1px;
+            border-radius: 30px; 
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            z-index: 10;
+        }
+        .btn-expand:hover { 
+            border-color: var(--accent); 
+            color: var(--accent); 
+            background: var(--surface-hover); 
+            box-shadow: 0 4px 15px rgba(0,255,0,0.15);
+        }
+
+        /* --- GRID --- */
+        .grid-container { max-width: 1200px; margin: 0 auto; padding: 2rem; width: 100%; }
+
+        .filters { margin-bottom: 2rem; display: flex; gap: 1rem; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
+        .filter-tag { font-family: var(--font); background: none; border: none; border-bottom: 1px solid transparent; font-size: 0.75rem; color: var(--text-dim); cursor: pointer; padding-bottom: 4px; border-bottom: 1px solid transparent; white-space: nowrap; transition: 0.2s; }
+        .filter-tag:hover { color: var(--text-main); }
+        .filter-tag.active { color: var(--text-main); border-bottom-color: var(--text-main); }
+        .filter-tag.filter-split { margin-left: 0.5rem; padding-left: 1rem; border-left: 1px solid var(--border); color: var(--accent); }
+        .filter-tag.filter-split.active { border-bottom-color: var(--accent); }
+
+        /* --- SITES, STORES & EXTENSIONS --- */
+        .links-section { margin-top: 4rem; padding-top: 2rem; border-top: 1px dashed var(--border); }
+        .links-header { color: var(--text-dim); font-weight: 700; font-size: 0.9rem; letter-spacing: 2px; margin-bottom: 1.5rem; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+        .links-header .icon { color: var(--accent); }
+        .links-header small { letter-spacing: 0; font-weight: 300; font-size: 0.75rem; text-transform: none; }
+        .link-group { margin-bottom: 2.5rem; }
+        .link-group-title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-main); margin-bottom: 1rem; }
+        .link-group-title span { color: var(--text-dim); margin-left: 6px; }
+        .card-link { border-style: dashed; }
+        .card-link:hover { border-style: solid; }
+        .launch-link.is-external::after { content: "↗"; }
+        .card-badge { display: inline-block; font-size: 0.55rem; font-weight: 700; letter-spacing: 1px; color: var(--bg); background: var(--accent); padding: 2px 5px; margin-left: 6px; vertical-align: middle; }
+        .empty-state { display: none; text-align: center; color: var(--text-dim); font-size: 0.85rem; padding: 4rem 1rem; }
+
+        .app-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        /* --- CARD & SCROLL ANIMATION --- */
+        .card {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.2s ease;
+            position: relative;
+            opacity: 0; 
+        }
+        
+        .card.in-view { animation: holoSnap 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+        .card.out-view { animation: holoFadeOut 0.4s ease-in forwards; }
+
+        .card:hover { 
+            border-color: var(--text-dim); 
+            transform: translateY(-4px) scale(1.01); 
+            background: var(--surface); 
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.8);
+            z-index: 2;
+        }
+
+        .card-header { display: flex; justify-content: space-between; margin-bottom: 1rem; }
+        .card-icon { font-size: 1.5rem; filter: grayscale(100%); transition: 0.3s; }
+        .card:hover .card-icon { filter: grayscale(0%); transform: scale(1.1) rotate(5deg); }
+        .card-cat { font-size: 0.6rem; text-transform: uppercase; color: var(--text-dim); border: 1px solid var(--border); padding: 2px 6px; height: fit-content; }
+
+        .card-title { font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .card-desc { font-size: 0.8rem; color: var(--text-dim); line-height: 1.6; flex-grow: 1; margin-bottom: 1.5rem; }
+
+        .launch-link { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 5px; }
+        .launch-link::after { content: "->"; transition: 0.2s; }
+        .launch-link:hover::after { margin-left: 5px; color: var(--accent); }
+
+        .admin-tools { display: none; gap: 5px; margin-top: auto; grid-template-columns: 1fr 1fr; }
+        .admin-active .launch-link { display: none; }
+        .admin-active .admin-tools { display: grid; }
+
+        /* --- MODALS --- */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); z-index: 100; display: none; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+        .modal-overlay.open { display: flex; }
+        .modal { 
+            background: var(--bg); 
+            border: 1px solid var(--text-main); 
+            width: 500px; 
+            max-width: 90%; 
+            padding: 2rem; 
+            position: relative;
+            animation: modalPop 0.3s ease-out; 
+        }
+        .close-btn { position: absolute; top: 1rem; right: 1rem; font-size: 1.5rem; color: var(--text-dim); transition: 0.2s; }
+        .close-btn:hover { color: var(--danger); }
+
+        .form-label { display: block; font-size: 0.75rem; color: var(--text-dim); margin-bottom: 0.5rem; text-transform: uppercase; }
+        .form-group { margin-bottom: 1.5rem; }
+
+        .qr-display { background: #fff; padding: 10px; width: 200px; margin: 0 auto 20px; transition: 0.3s; }
+        .qr-display:hover { transform: scale(1.05); }
+        .qr-display img { width: 100%; display: block; }
+        .upi-row { border: 1px solid var(--border); padding: 10px; margin-bottom: 5px; font-size: 0.8rem; cursor: pointer; display: flex; justify-content: space-between; transition: 0.2s; }
+        .upi-row:hover { border-color: var(--text-main); background: var(--surface); color: var(--accent); }
+
+        footer { text-align: center; padding: 3rem; color: var(--text-dim); font-size: 0.75rem; border-top: 1px solid var(--border); }
+    </style>
+</head>
+<body>
+
+    <header id="main-header">
+        <div class="brand">H24<span>_NEXUS</span></div>
+        <div class="search-container">
+            <span style="color:var(--text-dim)">></span>
+            <input type="text" id="searchInput" class="search-input" placeholder="search_apps_&_games..." autocomplete="off">
+        </div>
+        <div class="action-buttons" style="display:flex; gap:1rem; align-items: center;">
+            <button class="btn btn-donate" onclick="openModal('modal-donate')">♥️ing it?</button>
+            <button class="btn btn-icon-only" onclick="toggleAdmin()" title="Admin Login">🔒</button>
+        </div>
+    </header>
+
+    <div id="admin-bar">
+        <span style="color:var(--accent); font-size:0.8rem;">[ADMIN]</span>
+        <div class="admin-actions" style="display:flex; gap:10px; width:100%; justify-content:flex-end;">
+            <button class="btn btn-primary" onclick="initAddApp()">
+                <span class="desktop-text">+ New App</span>
+                <span class="mobile-icon">+</span>
+            </button>
+            <button class="btn" style="border-color:var(--accent); color:var(--accent);" onclick="exportCode()">
+                <span class="desktop-text">Save & Export</span>
+                <span class="mobile-icon">💾</span>
+            </button>
+            <button class="btn btn-danger" onclick="logout()">
+                <span class="desktop-text">Exit</span>
+                <span class="mobile-icon">✖</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="grid-container">
+        <div class="filters" id="filter-bar"></div>
+
+        <div id="trending-section" class="trending-wrapper">
+            <div class="trending-header">
+                <span class="icon">🔥</span> NEW_RELEASES // TRENDING
+            </div>
+            <div class="trending-grid" id="trending-grid"></div>
+            <button class="btn-expand" id="expand-btn" onclick="toggleTrending()">EXPAND [+]</button>
+        </div>
+
+        <div class="app-grid" id="app-grid"></div>
+
+        <div id="links-section" class="links-section">
+            <div class="links-header">
+                <span class="icon">↗</span> SITES, STORES &amp; EXTENSIONS
+                <small>These open a website or store page, not an app.</small>
+            </div>
+            <div id="links-groups"></div>
+        </div>
+
+        <div id="empty-state" class="empty-state">&gt; NO_MATCH_FOUND. Try another search.</div>
+    </div>
+
+    <footer>
+        HARSHA VARTHAN E P // FREE APPS &amp; TOOLS
+        <br>
+        <a href="mailto:harshavarthanep@gmail.com" style="border-bottom:1px dotted #666; margin-top:10px; display:inline-block;">harshavarthanep@gmail.com</a>
+    </footer>
+
+    <div id="modal-app" class="modal-overlay">
+        <div class="modal">
+            <button class="close-btn" onclick="closeModal('modal-app')">×</button>
+            <div style="font-size:1.2rem; font-weight:700; margin-bottom:1.5rem; border-bottom:1px solid #333; padding-bottom:10px;">CONFIGURE_APP</div>
+
+            <form id="appForm">
+                <input type="hidden" id="edit-index">
+
+                <div class="form-group">
+                    <label class="form-label">Target URL (Auto-Fetch Enabled)</label>
+                    <div style="display:flex; gap:10px;">
+                        <input type="url" id="inp-link" placeholder="https://" required>
+                        <button type="button" class="btn" id="fetch-btn" onclick="fetchMetadata()">FETCH</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Name</label>
+                    <input type="text" id="inp-name" required>
+                </div>
+
+                <div class="form-group" style="display:grid; grid-template-columns: 2fr 1fr; gap:10px;">
+                    <div>
+                        <label class="form-label">Category</label>
+                        <input type="text" id="inp-cat" list="cat-list" required>
+                        <datalist id="cat-list"></datalist>
+                    </div>
+                    <div>
+                        <label class="form-label">Icon</label>
+                        <input type="text" id="inp-icon" placeholder="Emoji" maxlength="4">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Type</label>
+                    <select id="inp-type">
+                        <option value="app">App (opens the app)</option>
+                        <option value="link">Site / Store / Extension (opens a page)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea id="inp-desc" rows="4" required></textarea>
+                </div>
+
+                <button type="button" class="btn btn-primary" style="width:100%" onclick="saveApp()">CONFIRM DATA</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="modal-donate" class="modal-overlay">
+        <div class="modal" style="text-align:center;">
+            <button class="close-btn" onclick="closeModal('modal-donate')">×</button>
+            <div style="font-size:1.2rem; font-weight:700; margin-bottom:1.5rem;">BUY ME A ☕?</div>
+            <div class="qr-display">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=8667701001@upi&pn=Harsha%20Varthan" alt="QR">
+            </div>
+            <div style="font-size:1.2rem; font-weight:100; margin-bottom:1.5rem;">Scan Using Any UPI App</div>
+            <div class="upi-row" onclick="copy('8667701001@upi')"><span>8667701001@upi</span><span>[COPY]</span></div>
+            <div class="upi-row" onclick="copy('8667701001@yapl')"><span>8667701001@yapl</span><span>[COPY]</span></div>
+        </div>
+    </div>
+
+    <script>
+        /* ================================================================
+           CORE DATABASE
+           type "app"  = web app (opens the app itself)
+           type "link" = website, store page or extension listing
+                         (shown in the separate "Sites, Stores & Extensions" area)
+           Flick Flick: when it goes live, replace its "link" with the live
+           Chrome Web Store URL and delete the line  "status": "preview",
+           ================================================================
+        */
+        /* DB_START */
+        let apps = [
+            {
+                "name": "ZenDocs Pro",
+                "link": "https://harshavarthanep.github.io/NotesV2/",
+                "category": "Productivity",
+                "icon": "✍️",
+                "type": "app",
+                "desc": "Writing workspace with linked notes, a live graph, kanban, Eisenhower matrix, focus timer and real Word/PDF export. Works offline and syncs across devices."
+            },
+            {
+                "name": "Nodalis Editor",
+                "link": "https://harshavarthanep.github.io/Nodalis-apps/#editor",
+                "category": "Productivity",
+                "icon": "🕸️",
+                "type": "app",
+                "desc": "Offline-first knowledge workspace: notes editor, knowledge graph, boards, tasks, priority matrix, sticky wall and daily review in one place."
+            },
+            {
+                "name": "Shelf Shelf",
+                "link": "https://harshavarthanep.github.io/Shelf-Shelf/",
+                "category": "Productivity",
+                "icon": "🗂️",
+                "type": "app",
+                "desc": "Your favourite websites as apps, folders and a dock, plus to-dos with reminders. Free, private and synced."
+            },
+            {
+                "name": "Tallyroll",
+                "link": "https://harshavarthanep.github.io/Tallyroll/",
+                "category": "Tools",
+                "icon": "🎬",
+                "type": "app",
+                "desc": "Screen and camera recorder in the browser. No watermark, no time limit, no account. Trim it, then share a link that expires when you choose."
+            },
+            {
+                "name": "OwlKaraoke",
+                "link": "https://harshavarthanep.github.io/owlkaraoke/",
+                "category": "Tools",
+                "icon": "🎤",
+                "type": "app",
+                "desc": "Karaoke studio that removes vocals from any song, changes key and tempo, syncs lyrics, records your take and exports audio or video. Runs fully on your device."
+            },
+            {
+                "name": "Kuro Logic",
+                "link": "https://harshavarthanep.github.io/Kuro-Logic/",
+                "category": "Games",
+                "icon": "🧩",
+                "type": "app",
+                "desc": "Minimal logic puzzle with levels, IQ points and power-ups. Install it and play offline."
+            },
+            {
+                "name": "CMA Companion",
+                "link": "https://harshavarthanep.github.io/CMA-companion/",
+                "category": "Education",
+                "icon": "🎓",
+                "type": "app",
+                "desc": "Digital companion for CMA aspirants with study trackers."
+            },
+            {
+                "name": "My Companion",
+                "link": "https://harshavarthanep.github.io/My-companion/",
+                "category": "Productivity",
+                "icon": "🎯",
+                "type": "app",
+                "desc": "Digital companion for high productivity with goal trackers."
+            },
+            {
+                "name": "ZenPDF",
+                "link": "https://harshavarthanep.github.io/pdf-edit/",
+                "category": "Tools",
+                "icon": "📝",
+                "type": "app",
+                "desc": "Edit, sign, fill, merge, split, compress and convert PDFs privately in your browser. Your files never leave your device."
+            },
+            {
+                "name": "Exam Ready Pro",
+                "link": "https://harshavarthanep.github.io/Notes-to-Quizz/",
+                "category": "Education",
+                "icon": "🧠",
+                "type": "app",
+                "desc": "Convert notes to interactive quizzes for active recall."
+            },
+            {
+                "name": "InfinityDrop Turbo",
+                "link": "https://harshavarthanep.github.io/Files-transfer2/",
+                "category": "Productivity",
+                "icon": "🚀",
+                "type": "app",
+                "desc": "High-speed WebRTC file transfer. No server limits."
+            },
+            {
+                "name": "InfinityDrop P2P",
+                "link": "https://harshavarthanep.github.io/Files-transfer/",
+                "category": "Productivity",
+                "icon": "🔗",
+                "type": "app",
+                "desc": "Local peer-to-peer file sharing."
+            },
+            {
+                "name": "QR Studio",
+                "link": "https://harshavarthanep.github.io/Dynamic-QR/",
+                "category": "Tools",
+                "icon": "🔳",
+                "type": "app",
+                "desc": "Generate and manage dynamic QR codes."
+            },
+            {
+                "name": "Wealth Tracker",
+                "link": "https://harshavarthanep.github.io/Wealth-tracker/",
+                "category": "Finance",
+                "icon": "💰",
+                "type": "app",
+                "desc": "Net worth and expense tracking dashboard."
+            },
+            {
+                "name": "HTML2APK",
+                "link": "https://harshavarthanep.github.io/HTML2APK/",
+                "category": "Dev Tools",
+                "icon": "📱",
+                "type": "app",
+                "desc": "Wrapper tool to convert HTML/JS into an Android APK."
+            },
+            {
+                "name": "BrandZen",
+                "link": "https://harshavarthanep.github.io/Brand-building/",
+                "category": "Dev Tools",
+                "icon": "⚡",
+                "type": "app",
+                "desc": "Brand name generator, strategic intelligence and competitor analysis."
+            },
+            {
+                "name": "ZenDocs Classic",
+                "link": "https://harshavarthanep.github.io/Notes/",
+                "category": "Productivity",
+                "icon": "📒",
+                "type": "app",
+                "desc": "The original ZenDocs: take notes that sync across all your devices."
+            },
+            {
+                "name": "DataViz Pro",
+                "link": "https://harshavarthanep.github.io/Sheets2Charts/",
+                "category": "Productivity",
+                "icon": "📊",
+                "type": "app",
+                "desc": "Visualise, compare and analyse Excel/CSV sheet data."
+            },
+            {
+                "name": "Speech Studio",
+                "link": "https://harshavarthanep.github.io/Audio2text/",
+                "category": "Tools",
+                "icon": "🎧",
+                "type": "app",
+                "desc": "Convert any audio into text and download it as a Word file."
+            },
+            {
+                "name": "NoirRain",
+                "link": "https://harshavarthanep.github.io/NoirRain/",
+                "category": "Games",
+                "icon": "☂️",
+                "type": "app",
+                "desc": "An atmospheric falling game. Install it, it works offline."
+            },
+            {
+                "name": "InkBlade",
+                "link": "https://harshavarthanep.github.io/InkBlade/",
+                "category": "Games",
+                "icon": "🔴",
+                "type": "app",
+                "desc": "A tactical action game. Install it, it works offline."
+            },
+            {
+                "name": "Rmax ISP",
+                "link": "http://rmaxisp.com/",
+                "category": "Client Websites",
+                "icon": "🌐",
+                "type": "link",
+                "desc": "Website and installable app for Rmax, a Chennai internet service and IT infrastructure company."
+            },
+            {
+                "name": "Blend Infra",
+                "link": "https://www.blendinfra.com/",
+                "category": "Client Websites",
+                "icon": "🏗️",
+                "type": "link",
+                "desc": "Website for a Tamil Nadu turnkey construction and interiors firm, with services, gallery and an enquiry form."
+            },
+            {
+                "name": "OCB Official",
+                "link": "https://ocbofficial.com/",
+                "category": "Client Websites",
+                "icon": "👕",
+                "type": "link",
+                "desc": "Pre-launch website for OCB, a US clothing brand: brand story, lookbook and early-access sign-up."
+            },
+            {
+                "name": "Arjuna Hospital",
+                "link": "https://www.arjunahospital.in/",
+                "category": "Client Websites",
+                "icon": "🏥",
+                "type": "link",
+                "desc": "Hospital brand built from scratch: identity, website, medical content and search ranking."
+            },
+            {
+                "name": "LKS Polyclinic",
+                "link": "https://www.lkspolyclinic.com/",
+                "category": "Client Websites",
+                "icon": "🩺",
+                "type": "link",
+                "desc": "Polyclinic brand identity, digital revamp and social media integration."
+            },
+            {
+                "name": "DAP Fitness",
+                "link": "https://dap-fitness-studio-web.vercel.app/",
+                "category": "Client Websites",
+                "icon": "🏋️",
+                "type": "link",
+                "desc": "Modern fitness studio website, built for local search visibility."
+            },
+            {
+                "name": "ZenDocs Pro Website",
+                "link": "https://harshavarthanep.github.io/ZenDocs/",
+                "category": "Product Websites",
+                "icon": "📘",
+                "type": "link",
+                "desc": "Product site for ZenDocs Pro with a live, clickable tour, install steps and early-access sign-up."
+            },
+            {
+                "name": "Nodalis",
+                "link": "https://harshavarthanep.github.io/Nodalis/",
+                "category": "Product Websites",
+                "icon": "🧠",
+                "type": "link",
+                "desc": "Local-first notes, canvas and knowledge-graph software. Notes stay as plain markdown on your own disk."
+            },
+            {
+                "name": "Shelf Shelf for Chrome",
+                "link": "https://chromewebstore.google.com/detail/shelf-shelf-%E2%80%94-app-launche/bhhnembgfddoomakgmegbhkpklcgelhn",
+                "category": "Extensions",
+                "icon": "🔌",
+                "type": "link",
+                "desc": "App launcher, dock and to-do extension with reminders and sync. Live on the Chrome Web Store."
+            },
+            {
+                "name": "Flick Flick",
+                "link": "https://chromewebstore.google.com/detail/ccjfgehimibjhjfbncilcfpdpnaibkml/preview?hl=en-GB",
+                "category": "Extensions",
+                "icon": "⚡",
+                "type": "link",
+                "status": "preview",
+                "desc": "Jump back to your last tab in one keystroke, plus Arc and Zen-style productivity features for Chromium browsers."
+            },
+            {
+                "name": "H24 Creationz on Google Play",
+                "link": "https://play.google.com/store/apps/dev?id=8039460198278259208",
+                "category": "Stores",
+                "icon": "🤖",
+                "type": "link",
+                "desc": "Android apps on Google Play, including Confident Candidate, Aegan, I Am Antifragile, Monster Affirmation, TextHack and Retro Shooter."
+            },
+            {
+                "name": "Portfolio",
+                "link": "https://harshavarthanep.github.io/portfolio/",
+                "category": "More",
+                "icon": "👤",
+                "type": "link",
+                "desc": "Harsha's work: experience, products, client brands and résumé."
+            },
+            {
+                "name": "Design Vault",
+                "link": "https://drive.google.com/drive/folders/1gS8AA5x-DoGLNGvXPDyXu_a4bJl2q08c?usp=sharing",
+                "category": "More",
+                "icon": "🎨",
+                "type": "link",
+                "desc": "Graphic design portfolio: branding and visual assets on Google Drive."
+            },
+            {
+                "name": "Mind Feast",
+                "link": "https://www.amazon.in/s?k=Mind+Feast+Harsha+Varthan",
+                "category": "More",
+                "icon": "📕",
+                "type": "link",
+                "desc": "Book: a guide to self-esteem and personality development."
+            },
+            {
+                "name": "Inspiring Illusions",
+                "link": "https://www.amazon.in/s?k=Inspiring+Illusions+Harsha+Varthan",
+                "category": "More",
+                "icon": "📗",
+                "type": "link",
+                "desc": "Book: original quotes for deep thinkers and creative minds."
+            }
+        ];
+        /* DB_END */
+
+        /* ================================================================
+           MANUAL TRENDING LIST (app names, shown in this order)
+           ================================================================
+        */
+        let trendingList = [
+            "ZenDocs Pro",
+            "Nodalis Editor",
+            "ZenPDF",
+            "InfinityDrop Turbo",
+            "QR Studio",
+            "Wealth Tracker",
+            "Tallyroll",
+            "OwlKaraoke",
+            "Kuro Logic"
+        ];
+
+        /* Order of the "Sites, Stores & Extensions" groups */
+        const LINK_GROUPS = ["Client Websites", "Product Websites", "Extensions", "Stores", "More"];
+        const LINK_ACTIONS = {
+            "Client Websites": "VISIT_SITE",
+            "Product Websites": "VISIT_SITE",
+            "Extensions": "OPEN_IN_STORE",
+            "Stores": "OPEN_STORE",
+            "More": "OPEN_LINK"
+        };
+
+        const isLink = a => a.type === 'link';
+        const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        const safeUrl = u => /^(https?:)?\/\//i.test(String(u || '')) ? String(u) : '#';
+
+        // --- SCROLL OBSERVER (FADE IN/OUT) ---
+        const scrollObserver = ('IntersectionObserver' in window) ? new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.remove('out-view');
+                    entry.target.classList.add('in-view');
+                } else if (entry.target.classList.contains('in-view')) {
+                    entry.target.classList.remove('in-view');
+                    entry.target.classList.add('out-view');
+                }
+            });
+        }, { threshold: 0.1 }) : null;
+        function observe(el) { if (scrollObserver) scrollObserver.observe(el); else el.classList.add('in-view'); }
+
+        // --- INIT ---
+        let currentFilter = 'ALL';
+        let isTrendingExpanded = false;
+
+        function init() {
+            renderFilters();
+            renderTrending();
+            renderGrid();
+            document.getElementById('searchInput').addEventListener('input', (e) => renderGrid(e.target.value));
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
+                if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+                    e.preventDefault(); document.getElementById('searchInput').focus();
+                }
+            });
+            document.querySelectorAll('.modal-overlay').forEach(m => m.addEventListener('click', (e) => { if (e.target === m) m.classList.remove('open'); }));
+        }
+
+        // --- CARD BUILDER ---
+        function cardHTML(app, index) {
+            const link = isLink(app);
+            const action = link ? (app.status === 'preview' ? 'PREVIEW' : (LINK_ACTIONS[app.category] || 'OPEN_LINK')) : 'INITIALIZE_APP';
+            const badge = app.status === 'preview' ? '<span class="card-badge">COMING_SOON</span>' : '';
+            return `
+                <div class="card-header">
+                    <div class="card-icon">${esc(app.icon || '⚡')}</div>
+                    <div class="card-cat">${esc(app.category)}</div>
+                </div>
+                <div class="card-title">${esc(app.name)} ${badge}</div>
+                <div class="card-desc">${esc(app.desc)}</div>
+                <a href="${esc(safeUrl(app.link))}" target="_blank" rel="noopener noreferrer" class="launch-link${link ? ' is-external' : ''}">${action}</a>
+                <div class="admin-tools">
+                    <button class="btn" onclick="editApp(${index})">EDIT</button>
+                    <button class="btn btn-danger" onclick="deleteApp(${index})">DEL</button>
+                </div>`;
+        }
+        function makeCard(app, index) {
+            const card = document.createElement('div');
+            card.className = 'card' + (isLink(app) ? ' card-link' : '');
+            card.innerHTML = cardHTML(app, index);
+            observe(card);
+            return card;
+        }
+
+        // --- TRENDING LOGIC ---
+        function renderTrending() {
+            const container = document.getElementById('trending-grid');
+            container.innerHTML = '';
+            const trendingApps = [];
+            trendingList.forEach(name => {
+                const index = apps.findIndex(a => a.name === name && !isLink(a));
+                if (index > -1) trendingApps.push({ app: apps[index], index });
+            });
+            const appsToShow = isTrendingExpanded ? trendingApps : trendingApps.slice(0, 3);
+            appsToShow.forEach(({ app, index }) => container.appendChild(makeCard(app, index)));
+            document.getElementById('expand-btn').style.display = trendingApps.length > 3 ? '' : 'none';
+        }
+
+        function toggleTrending() {
+            isTrendingExpanded = !isTrendingExpanded;
+            const btn = document.getElementById('expand-btn');
+            const section = document.getElementById('trending-section');
+            const headerHeight = document.getElementById('main-header').offsetHeight;
+            renderTrending();
+            btn.innerText = isTrendingExpanded ? "COLLAPSE [-]" : "EXPAND [+]";
+            setTimeout(() => {
+                const y = isTrendingExpanded
+                    ? section.getBoundingClientRect().bottom + window.scrollY - window.innerHeight + 50
+                    : section.getBoundingClientRect().top + window.scrollY - headerHeight - 20;
+                window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+            }, 50);
+        }
+
+        function renderFilters() {
+            const appCats = [...new Set(apps.filter(a => !isLink(a)).map(a => a.category))];
+            const hasLinks = apps.some(isLink);
+            const container = document.getElementById('filter-bar');
+            const dataList = document.getElementById('cat-list');
+            container.innerHTML = '';
+            dataList.innerHTML = '';
+
+            const addTag = (label, value, extra) => {
+                const span = document.createElement('button');
+                span.type = 'button';
+                span.className = `filter-tag ${value === currentFilter ? 'active' : ''} ${extra || ''}`;
+                span.innerText = label;
+                span.onclick = () => { currentFilter = value; renderFilters(); renderGrid(document.getElementById('searchInput').value); };
+                container.appendChild(span);
+            };
+            addTag('ALL', 'ALL');
+            appCats.forEach(c => addTag(c, c));
+            if (hasLinks) addTag('SITES, STORES & EXTENSIONS', 'LINKS', 'filter-split');
+
+            [...new Set([...appCats, ...LINK_GROUPS])].forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c;
+                dataList.appendChild(opt);
+            });
+            if (currentFilter !== 'ALL' && currentFilter !== 'LINKS' && !appCats.includes(currentFilter)) currentFilter = 'ALL';
+        }
+
+        function matches(app, search) {
+            if (!search) return true;
+            return [app.name, app.desc, app.category].some(v => String(v || '').toLowerCase().includes(search));
+        }
+
+        function renderGrid(query = '') {
+            const container = document.getElementById('app-grid');
+            const trendingSection = document.getElementById('trending-section');
+            const linksSection = document.getElementById('links-section');
+            const linksWrap = document.getElementById('links-groups');
+            const empty = document.getElementById('empty-state');
+            container.innerHTML = '';
+            linksWrap.innerHTML = '';
+            const search = query.trim().toLowerCase();
+
+            const showTrending = currentFilter === 'ALL' && search === '';
+            if (!showTrending) {
+                trendingSection.style.opacity = '0';
+                clearTimeout(renderGrid._t);
+                renderGrid._t = setTimeout(() => { trendingSection.style.display = 'none'; }, 300);
+            } else {
+                clearTimeout(renderGrid._t);
+                trendingSection.style.display = 'block';
+                setTimeout(() => { trendingSection.style.opacity = '1'; }, 10);
+            }
+
+            let shown = 0;
+
+            // Apps
+            if (currentFilter !== 'LINKS') {
+                apps.forEach((app, index) => {
+                    if (isLink(app)) return;
+                    if (currentFilter !== 'ALL' && app.category !== currentFilter) return;
+                    if (!matches(app, search)) return;
+                    container.appendChild(makeCard(app, index));
+                    shown++;
+                });
+            }
+            container.style.display = container.children.length ? '' : 'none';
+
+            // Sites, stores & extensions
+            let linkCount = 0;
+            if (currentFilter === 'ALL' || currentFilter === 'LINKS') {
+                const groups = [...LINK_GROUPS, ...new Set(apps.filter(isLink).map(a => a.category).filter(c => !LINK_GROUPS.includes(c)))];
+                groups.forEach(group => {
+                    const items = apps.map((a, i) => ({ a, i })).filter(({ a }) => isLink(a) && a.category === group && matches(a, search));
+                    if (!items.length) return;
+                    const block = document.createElement('div');
+                    block.className = 'link-group';
+                    block.innerHTML = `<div class="link-group-title">${esc(group)} <span>${items.length}</span></div>`;
+                    const grid = document.createElement('div');
+                    grid.className = 'app-grid';
+                    items.forEach(({ a, i }) => grid.appendChild(makeCard(a, i)));
+                    block.appendChild(grid);
+                    linksWrap.appendChild(block);
+                    linkCount += items.length;
+                });
+            }
+            linksSection.style.display = linkCount ? '' : 'none';
+            shown += linkCount;
+
+            empty.style.display = shown ? 'none' : 'block';
+        }
+
+        // --- ADMIN FUNCTIONS ---
+        function toggleAdmin() {
+            if (document.body.classList.contains('admin-active')) return;
+            const key = prompt("AUTH_KEY:");
+            if (key === null) return;
+            if (key === "admin") document.body.classList.add('admin-active');
+            else alert("ACCESS_DENIED");
+        }
+        function logout() { document.body.classList.remove('admin-active'); }
+
+        function initAddApp() {
+            document.getElementById('appForm').reset();
+            document.getElementById('edit-index').value = "-1";
+            document.getElementById('inp-type').value = "app";
+            openModal('modal-app');
+        }
+
+        function editApp(index) {
+            const d = apps[index];
+            if (!d) return;
+            document.getElementById('edit-index').value = index;
+            document.getElementById('inp-link').value = d.link || '';
+            document.getElementById('inp-name').value = d.name || '';
+            document.getElementById('inp-cat').value = d.category || '';
+            document.getElementById('inp-icon').value = d.icon || '';
+            document.getElementById('inp-desc').value = d.desc || '';
+            document.getElementById('inp-type').value = isLink(d) ? 'link' : 'app';
+            openModal('modal-app');
+        }
+
+        function saveApp() {
+            const idx = parseInt(document.getElementById('edit-index').value, 10);
+            const base = (idx >= 0 && apps[idx]) ? apps[idx] : {};
+            const newObj = {
+                ...base,
+                name: document.getElementById('inp-name').value.trim(),
+                link: document.getElementById('inp-link').value.trim(),
+                category: document.getElementById('inp-cat').value.trim(),
+                icon: document.getElementById('inp-icon').value.trim(),
+                desc: document.getElementById('inp-desc').value.trim(),
+                type: document.getElementById('inp-type').value
+            };
+            if (!newObj.name || !newObj.link || !newObj.category) return alert("DATA_INCOMPLETE");
+            if (apps.some((a, i) => i !== idx && a.name.toLowerCase() === newObj.name.toLowerCase())) return alert("NAME_ALREADY_EXISTS");
+
+            if (idx === -1 || isNaN(idx)) apps.push(newObj);
+            else apps[idx] = newObj;
+
+            closeModal('modal-app');
+            renderFilters();
+            renderTrending();
+            renderGrid(document.getElementById('searchInput').value);
+        }
+
+        function deleteApp(index) {
+            if (confirm("CONFIRM_DELETION?")) {
+                apps.splice(index, 1);
+                renderFilters();
+                renderTrending();
+                renderGrid(document.getElementById('searchInput').value);
+            }
+        }
+
+        // --- SMART AUTO FETCH ---
+        async function fetchMetadata() {
+            const url = document.getElementById('inp-link').value;
+            const btn = document.getElementById('fetch-btn');
+            if (!url) return;
+            btn.innerText = "⏳...";
+            try {
+                const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`);
+                const data = await res.json();
+                if (data.contents) {
+                    const doc = new DOMParser().parseFromString(data.contents, "text/html");
+                    const title = doc.querySelector('title')?.textContent.trim() || "";
+                    const desc = doc.querySelector('meta[name="description"]')?.content ||
+                                 doc.querySelector('meta[property="og:description"]')?.content || "";
+                    if (title) document.getElementById('inp-name').value = title;
+                    if (desc) document.getElementById('inp-desc').value = desc;
+
+                    const t = (title + " " + desc).toLowerCase();
+                    const catInp = document.getElementById('inp-cat');
+                    const iconInp = document.getElementById('inp-icon');
+                    if (/chromewebstore|play\.google/.test(url)) {
+                        document.getElementById('inp-type').value = 'link';
+                        catInp.value = /chromewebstore/.test(url) ? "Extensions" : "Stores"; iconInp.value = "🔌";
+                    } else if (t.includes('money') || t.includes('wealth') || t.includes('finance')) {
+                        catInp.value = "Finance"; iconInp.value = "💰";
+                    } else if (t.includes('study') || t.includes('quiz') || t.includes('exam')) {
+                        catInp.value = "Education"; iconInp.value = "🎓";
+                    } else if (t.includes('code') || t.includes('dev') || t.includes('html')) {
+                        catInp.value = "Dev Tools"; iconInp.value = "💻";
+                    } else if (t.includes('game') || t.includes('play')) {
+                        catInp.value = "Games"; iconInp.value = "🎮";
+                    } else {
+                        catInp.value = "Productivity"; iconInp.value = "🚀";
+                    }
+                }
+            } catch (e) {
+                alert("FETCH_FAIL: PLEASE_ENTER_MANUALLY");
+            }
+            btn.innerText = "FETCH";
+        }
+
+        // --- CLEAN EXPORT ---
+        async function copyText(txt) {
+            try { await navigator.clipboard.writeText(txt); return true; }
+            catch (e) {
+                const ta = document.createElement('textarea');
+                ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0';
+                document.body.appendChild(ta); ta.select();
+                let ok = false; try { ok = document.execCommand('copy'); } catch (_) {}
+                ta.remove(); return ok;
+            }
+        }
+
+        async function exportCode() {
+            const btn = document.querySelector('.admin-actions button[onclick="exportCode()"] .desktop-text');
+            const btnMobile = document.querySelector('.admin-actions button[onclick="exportCode()"] .mobile-icon');
+            const originalText = btn ? btn.innerText : "Save & Export";
+            if (btn) btn.innerText = "SAVING...";
+            if (btnMobile) btnMobile.innerText = "⏳";
+            const json = JSON.stringify(apps, null, 4);
+            const pattern = /(\/\* DB_START \*\/)([\s\S]*?)(\/\* DB_END \*\/)/;
+            try {
+                const response = await fetch(window.location.href.split('#')[0].split('?')[0] + '?t=' + Date.now(), { cache: 'no-store' });
+                if (!response.ok) throw new Error("Network response was not ok");
+                const sourceCode = await response.text();
+                if (!pattern.test(sourceCode)) throw new Error("Markers not found");
+                const finalCode = sourceCode.replace(pattern, (m, a, b, c) => `${a}\n        let apps = ${json};\n        ${c}`);
+                alert((await copyText(finalCode)) ? "✅ SUCCESS: CODE COPIED!" : "⚠️ COPY BLOCKED BY BROWSER");
+            } catch (err) {
+                console.error(err);
+                const html = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+                const backup = html.replace(pattern, (m, a, b, c) => `${a}\n        let apps = ${json};\n        ${c}`)
+                    .replace(' class="admin-active"', '');
+                alert((await copyText(backup)) ? "✅ COPIED (BACKUP MODE). Check the file before uploading." : "⚠️ COPY FAILED");
+            }
+            if (btn) btn.innerText = originalText;
+            if (btnMobile) btnMobile.innerText = "💾";
+        }
+
+        // --- UTILS ---
+        function openModal(id) { document.getElementById(id).classList.add('open'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+        async function copy(txt) { alert((await copyText(txt)) ? "COPIED: " + txt : "COPY FAILED: " + txt); }
+
+        init();
+    </script>
+
+</body>
+</html>
